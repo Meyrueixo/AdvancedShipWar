@@ -7,7 +7,7 @@ public class Jeu {
 	private int nbJoueurEnCour;
 	private String idJoueur1;
 	private String idJoueur2;
-	private boolean spectateurAutorisé;
+	private boolean spectateurAutorise;
 	
 	public Jeu() {
 		// TODO Auto-generated constructor stub

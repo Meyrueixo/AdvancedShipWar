@@ -15,7 +15,7 @@ public class InfoJeuBean {
 	private int nbJoueurEnCour;
 	private String idJoueur1;
 	private String idJoueur2;
-	private boolean spectateurAutorisé;
+	private boolean spectateurAutorise;
 	
 	
 	public String getToken() {
@@ -66,12 +66,12 @@ public class InfoJeuBean {
 		this.idJoueur2 = idJoueur2;
 	}
 
-	public boolean isSpectateurAutorisé() {
-		return spectateurAutorisé;
+	public boolean isSpectateurAutorise() {
+		return spectateurAutorise;
 	}
 
-	public void setSpectateurAutorisé(boolean spectateurAutorisé) {
-		this.spectateurAutorisé = spectateurAutorisé;
+	public void setSpectateurAutorise(boolean spectateurAutorise) {
+		this.spectateurAutorise = spectateurAutorise;
 	}
 
 	public InfoJeuBean() {
