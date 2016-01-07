@@ -86,50 +86,6 @@ function marquerCase(){
   render();
 }
 
-function getXMLHttpRequest() {
-  var xhr = null;
-
-  if (window.XMLHttpRequest || window.ActiveXObject) {
-    if (window.ActiveXObject) {
-      try {
-        xhr = new ActiveXObject("Msxml2.XMLHTTP");
-      } catch(e) {
-        xhr = new ActiveXObject("Microsoft.XMLHTTP");
-      }
-    } else {
-      xhr = new XMLHttpRequest();
-    }
-  } else {
-    alert("Votre navigateur ne supporte pas l'objet XMLHTTPRequest...");
-    return null;
-  }
-
-  return xhr;
-}
-function request(callback) {
-
-  var xhr = getXMLHttpRequest();
-
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-        callback(xhr.responseText);
-      }
-    };
-
-    xhr.open("GET", "insta.php", true);
-    xhr.send(null);
-}
-
-function readData(sData) {
-  // On peut maintenant traiter les données sans encombrer l'objet XHR.
-  if (sData != -1) {
-    infoserv.textContent = ("nb click " + sData);
-  } else {
-    infoserv.textContent = ("Y'a eu un problème");
-  }
-}
-
-
 function render()
 {
   // Render elements.
@@ -165,4 +121,18 @@ function render()
     context.fillText(element.name,(element.left+(element.width/2)) ,(element.top +(element.height/2)));
 
   });
+}
+/*--------------------web sockect -----------*/
+var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame");
+ws.onopen = function(){
+};
+ws.onmessage = function(message){
+    document.getElementById("chatlog").textContent += message.data + "\n";
+};
+function postToServer(){
+    ws.send(document.getElementById("msg").value);
+    document.getElementById("msg").value = "";
+}
+function closeConnect(){
+    ws.close();
 }

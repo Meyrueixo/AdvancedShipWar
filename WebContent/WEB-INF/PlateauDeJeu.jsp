@@ -15,6 +15,10 @@
 		            out.println( IdSession );
 	            %>
             </div>
+               <textarea id="chatlog" readonly></textarea><br/>
+		        <input id="msg" type="text"  width="500" height="50"/>
+		        <button type="submit" id="sendButton" onClick="postToServer()">Send lolilol!</button>
+		        <button type="submit" id="sendButton" onClick="closeConnect()">End</button>
       
 	        
 	        </p>
