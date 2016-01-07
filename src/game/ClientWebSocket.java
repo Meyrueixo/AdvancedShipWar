@@ -28,7 +28,7 @@ public class ClientWebSocket {
     private Session session;
     private String TokenPlayer;
     public Jeu monjeu;
-    
+    private ControleurDeConnexion controleCon =  ControleurDeConnexion.GETINSTANCE();
     
     public ClientWebSocket() {
         nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
@@ -62,7 +62,11 @@ public class ClientWebSocket {
         	JSONObject obj = new JSONObject(message);
         	if(obj.has("connect")){
         		String idgame = obj.getJSONObject("connect").getString("idgame");
-        		filteredMessage = String.format("%s: %s",nickname,idgame.toString());
+        		monjeu = controleCon.connexion(idgame, this);
+        		if(monjeu !=null){
+        			filteredMessage = String.format("nom de la partie : %s: %s",monjeu.nomDeLaPartie,monjeu.getToken());
+        		}
+        		
         	}
 		} catch (Exception e) {
 			filteredMessage ="Donnée invalide";

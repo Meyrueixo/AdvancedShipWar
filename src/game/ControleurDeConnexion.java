@@ -24,7 +24,8 @@ public class ControleurDeConnexion {
 	public void creationPartie(String Token , String nomParti){
 		listeJeu.add(new Jeu(Token,nomParti));
 	}
-	public void connexion(String idJeu,ClientWebSocket client){
+	
+	public Jeu connexion(String idJeu,ClientWebSocket client){
 		Jeu instanceJeu = recherche(idJeu);
 		
 		if(instanceJeu == null){
@@ -36,8 +37,9 @@ public class ControleurDeConnexion {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			return null;
 		}else{
-			//TODO gére ajout joueur ou spectateur
+			return instanceJeu;
 		}
 			
 	}
