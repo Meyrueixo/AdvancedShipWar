@@ -12,6 +12,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.json.JSONObject;
+
 @ServerEndpoint(value = "/AdvancedShipWarGame")
 public class ClientWebSocket {
 	 //private static final Log log = LogFactory.getLog(ChatAnnotation.class);
@@ -26,7 +28,7 @@ public class ClientWebSocket {
     private Session session;
     private String TokenPlayer;
     public Jeu monjeu;
-    
+    private ControleurDeConnexion controleCon =  ControleurDeConnexion.GETINSTANCE();
     
     public ClientWebSocket() {
         nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
@@ -54,8 +56,23 @@ public class ClientWebSocket {
     @OnMessage
     public void incoming(String message) {
         // Never trust the client
-        String filteredMessage = String.format("%s: %s",
-                nickname,message.toString());
+    	String filteredMessage = message;
+    	try {
+    		
+        	JSONObject obj = new JSONObject(message);
+        	if(obj.has("connect")){
+        		String idgame = obj.getJSONObject("connect").getString("idgame");
+        		monjeu = controleCon.connexion(idgame, this);
+        		if(monjeu !=null){
+        			filteredMessage = String.format("nom de la partie : %s: %s",monjeu.nomDeLaPartie,monjeu.getToken());
+        		}
+        		
+        	}
+		} catch (Exception e) {
+			filteredMessage ="Donnée invalide";
+		}
+    	
+        
         broadcast(filteredMessage);
     }
 

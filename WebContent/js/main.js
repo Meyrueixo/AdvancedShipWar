@@ -132,12 +132,18 @@ function render(){
 /*--------------------web sockect -----------*/
 var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame");
 ws.onopen = function(){
+	
 };
 ws.onmessage = function(message){
     document.getElementById("chatlog").textContent += message.data + "\n";
 };
+/*fonction envoi de message*/
+function sendMessage(message){
+	ws.send(message);
+}
+//propre a la console de debug
 function postToServer(){
-    ws.send(document.getElementById("msg").value);
+	sendMessage(document.getElementById("msg").value);
     document.getElementById("msg").value = "";
 }
 function closeConnect(){

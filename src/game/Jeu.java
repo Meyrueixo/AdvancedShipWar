@@ -32,6 +32,10 @@ public class Jeu {
 		return this.idJoueur1;
 	}
 	
+	public void setIdJoueur1(String id){
+		this.idJoueur1 = id;
+	}
+	
 	public String getIdJoueur2(){
 		return this.idJoueur2;
 	}

@@ -21,10 +21,19 @@ public class ControleurDeConnexion {
 		}
 		return instance;
 	}
-	public void creationPartie(String Token , String nomParti){
-		listeJeu.add(new Jeu(Token,nomParti));
+	public String creationPartie(String Token , String nomParti, String idJoueur1){
+		String idPartie = existeJoueur(idJoueur1);
+		if(idPartie == null){
+			Jeu monJeu =new Jeu(Token,nomParti, idJoueur1);
+			listeJeu.add(monJeu);
+			return monJeu.token;
+		}else{
+			return idPartie;
+		}
+
 	}
-	public void connexion(String idJeu,ClientWebSocket client){
+	
+	public Jeu connexion(String idJeu,ClientWebSocket client){
 		Jeu instanceJeu = recherche(idJeu);
 		
 		if(instanceJeu == null){
@@ -36,8 +45,9 @@ public class ControleurDeConnexion {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			return null;
 		}else{
-			//TODO gére ajout joueur ou spectateur
+			return instanceJeu;
 		}
 			
 	}
@@ -61,6 +71,21 @@ public class ControleurDeConnexion {
 			}	
 		}
 		return instanceJeu;
+	}
+	public String existeJoueur(String idJoueur){
+		Jeu instanceJeu = null;
+		boolean trouver = false;
+		String idPartie = null;
+		Iterator it =listeJeu.iterator();
+		while (it.hasNext() && !trouver ) {
+			
+			instanceJeu = ((Jeu)it.next());
+			if(idJoueur.equals(instanceJeu.getIdJoueur1())){
+				trouver = true;
+				idPartie = instanceJeu.token;
+			}	
+		}
+		return idPartie ;
 	}
 
 	private ControleurDeConnexion() {

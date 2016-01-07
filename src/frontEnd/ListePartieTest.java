@@ -47,13 +47,14 @@ public class ListePartieTest extends HttpServlet {
 					 PageJeu(request,  response,request.getParameter("Game"));
 			 		
 				 }else if (((String)request.getParameter("Create")) != null){
+					 //TODO bug nouvelle création de partie a chaque F5 
 			 			UUID idJeu = UUID.randomUUID();	
-			 			controleCon.creationPartie(idJeu.toString(), request.getParameter("nomPartie"));
-			 			
-			 			PageJeu(request,  response,idJeu.toString());
-			 			//PageListDejeu(request,  response);
+			 			HttpSession session = request.getSession();
+			 			String idjeuCrée = controleCon.creationPartie(idJeu.toString(), request.getParameter("nomPartie"),session.getId());		 			
+			 			PageJeu(request,  response,idjeuCrée);
+			 		
 			 		}
-				//doGet(request, response) ;
+			
 			}
 			 public void PageJeu(HttpServletRequest request, HttpServletResponse response,String idJeu ){
 				 	HttpSession session = request.getSession();
