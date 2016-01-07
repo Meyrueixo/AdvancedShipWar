@@ -12,6 +12,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.json.JSONObject;
+
 @ServerEndpoint(value = "/AdvancedShipWarGame")
 public class ClientWebSocket {
 	 //private static final Log log = LogFactory.getLog(ChatAnnotation.class);
@@ -54,8 +56,13 @@ public class ClientWebSocket {
     @OnMessage
     public void incoming(String message) {
         // Never trust the client
-        String filteredMessage = String.format("%s: %s",
-                nickname,message.toString());
+    	String filteredMessage = message;
+    	JSONObject obj = new JSONObject(message);
+    	if(obj.has("connect")){
+    		String idgame = obj.getJSONObject("connect").getString("idgame");
+    		filteredMessage = String.format("%s: %s",nickname,idgame.toString());
+    	}
+        
         broadcast(filteredMessage);
     }
 
