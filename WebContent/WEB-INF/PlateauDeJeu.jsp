@@ -16,9 +16,9 @@
 	            %>
             </div>
                <textarea id="chatlog" readonly></textarea><br/>
-		        <input id="msg" type="text"  width="500" height="50"/>
-		        <button type="submit" id="sendButton" onClick="postToServer()">Send lolilol!</button>
-		        <button type="submit" id="sendButton" onClick="closeConnect()">End</button>
+		        <textarea id="msg" type="text"  width="500" height="50"/></textarea>
+		        <button type="submit" id="sendButton" onClick="postToServer()">Send Json!</button>
+		        <button type="submit" id="sendButton" onClick="closeConnect()">End connection</button>
       
 	        
 	        </p>
