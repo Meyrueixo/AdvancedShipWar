@@ -17,5 +17,27 @@ public class Jeu {
 		this.token = token2;
 		this.nomDeLaPartie = nomParti;
 	}
+	
+	public Jeu(String token, String nomParti, String idJoueur1){
+		this.token = token;
+		this.nomDeLaPartie = nomParti;
+		this.idJoueur1 = idJoueur1;
+	}
+	
+	public String getToken(){
+		return this.token;
+	}
+	
+	public String getIdJoueur1(){
+		return this.idJoueur1;
+	}
+	
+	public String getIdJoueur2(){
+		return this.idJoueur2;
+	}
+	
+	public void setIdJoueur2(String id){
+		this.idJoueur2 = id;
+	}
 
 }
