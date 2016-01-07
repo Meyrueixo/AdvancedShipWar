@@ -1,16 +1,24 @@
-var elem = document.getElementById('myCanvas'),
-  elemLeft = elem.offsetLeft,
-  elemTop = elem.offsetTop,
-  taillex = elem.getAttribute('width')/10,
-  tailley = elem.getAttribute('height')/10,
-  context = elem.getContext('2d'),
+var elemAdversaire = document.getElementById('PlateauAdversaire'),
+  elemLeft = elemAdversaire.offsetLeft,
+  elemTop = elemAdversaire.offsetTop,
+  taillex = elemAdversaire.getAttribute('width')/10,
+  tailley = elemAdversaire.getAttribute('height')/10,
+  context = elemAdversaire.getContext('2d'),
   elements = [];
+
+var elemMaison = document.getElementById('PlateauMaison'),
+	elemLeft = elemAdversaire.offsetLeft,
+	elemTop = elemAdversaire.offsetTop,
+	taillex = elemAdversaire.getAttribute('width')/10,
+	tailley = elemAdversaire.getAttribute('height')/10,
+	context = elemAdversaire.getContext('2d'),
+	elements = [];
 var info = document.getElementById('info');
 var infoserv = document.getElementById('infoserv');
 var caseActu;
 
 // Add event listener for `click` events.
-elem.addEventListener('click', function(event) {
+elemAdversaire.addEventListener('click', function(event) {
   var x = event.pageX - elemLeft,
     y = event.pageY - elemTop;
 
@@ -86,12 +94,8 @@ function marquerCase(){
   render();
 }
 
-function render()
-{
-  // Render elements.
-  elements.forEach(function(element) {
-
-    if(element.type == 'mine')
+function renderBis(element){
+	if(element.type == 'mine')
     {
       context.fillStyle = '#0500FF';
       context.fillRect(element.left, element.top, element.width, element.height);
@@ -119,8 +123,11 @@ function render()
     context.strokeRect(element.left, element.top, element.width, element.height);
     context.fillStyle =  '#000000';
     context.fillText(element.name,(element.left+(element.width/2)) ,(element.top +(element.height/2)));
+}
 
-  });
+function render(){
+  // Render elements.
+  elements.forEach(renderBis);
 }
 /*--------------------web sockect -----------*/
 var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame");

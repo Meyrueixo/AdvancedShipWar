@@ -22,14 +22,19 @@
       
 	        
 	        </p>
-	<div>
-		<canvas id="myCanvas" width="500" height="500" style=" border: 3px solid #ccc;"/>
+
+	<div style =" width:1100px;height:500px;position:relative;">
+		<div style = "position:absolute;left:0%;width:50%;height:100%;">
+			<canvas id="PlateauAdversaire" width="500" height="500" style=" border: 3px solid #ccc;"/>
+		</div>
+		<div style = "position:absolute;left:50%;width:50%;height:100%;">
+			<canvas id="PlateauMaison" width="500" height="500" style=" border: 3px solid #ccc;"/>
+		</div>
 	</div>
+	
   <button onclick="poserMine();">Poser une mine</button>
   <button onclick="marquerCase();">Marquer case</button>
-  <div>
-		<canvas id="myCanvas" width="500" height="500" style=" border: 3px solid #ccc;"/>
-	</div>
+
 	<div>
 		<p id="info" >h</p>
 		<p id="infoserv" >h</p>
