@@ -57,11 +57,17 @@ public class ClientWebSocket {
     public void incoming(String message) {
         // Never trust the client
     	String filteredMessage = message;
-    	JSONObject obj = new JSONObject(message);
-    	if(obj.has("connect")){
-    		String idgame = obj.getJSONObject("connect").getString("idgame");
-    		filteredMessage = String.format("%s: %s",nickname,idgame.toString());
-    	}
+    	try {
+    		
+        	JSONObject obj = new JSONObject(message);
+        	if(obj.has("connect")){
+        		String idgame = obj.getJSONObject("connect").getString("idgame");
+        		filteredMessage = String.format("%s: %s",nickname,idgame.toString());
+        	}
+		} catch (Exception e) {
+			filteredMessage ="Donnée invalide";
+		}
+    	
         
         broadcast(filteredMessage);
     }
