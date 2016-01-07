@@ -31,7 +31,7 @@
 		</form>
 		<p> Crée une partie</p>
 		<form action="" method="post">
-			 Non de la partie<br>
+			 Nom de la partie<br>
 			  <input type="text" name="nomPartie">
 			  <br>
 			  	<input type="hidden" name="Create" value="true" >
