@@ -148,6 +148,12 @@ ws.onopen = function(){
 ws.onmessage = function(message){
 	document.getElementById("chatlog").textContent += message.data + "\n";
 };
+
+function sendJson(typeObjet, objet){
+	var messformat = ("{ \""+typeObjet+"\":"+JSON.stringify(objet)+"}");
+	sendMessage(messformat);
+}
+
 /*fonction envoi de message*/
 function sendMessage(message){
 	var messageForm = {}
