@@ -1,3 +1,4 @@
+
 var elemAdversaire = document.getElementById('PlateauAdversaire'),
   elemLeft = elemAdversaire.offsetLeft,
   elemTop = elemAdversaire.offsetTop,
@@ -16,6 +17,20 @@ var elemMaison = document.getElementById('PlateauMaison'),
 var info = document.getElementById('info');
 var infoserv = document.getElementById('infoserv');
 var caseActu;
+
+function creationPlateau( idPlateau){
+	/** constructeur de plateau pour simplifier */
+var canvas = document.getElementById(idPlateau);
+var Plateau = {	zone: canvas ,
+		elemLeft : canvas.offsetLeft,
+		elemTop : canvas.offsetTop,
+		taillex : canvas.getAttribute('width')/10,
+		tailley : canvas.getAttribute('height')/10,
+		context : canvas.getContext('2d'),
+		elements : []
+	};
+ return Plateau 
+}
 
 // Add event listener for `click` events.
 elemAdversaire.addEventListener('click', function(event) {
@@ -134,13 +149,16 @@ var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame"
 ws.onopen = function(){
 	
 };
+/*reception message*/
 ws.onmessage = function(message){
     document.getElementById("chatlog").textContent += message.data + "\n";
 };
 /*fonction envoi de message*/
 function sendMessage(message){
+	var messageForm = {}
 	ws.send(message);
 }
+
 //propre a la console de debug
 function postToServer(){
 	sendMessage(document.getElementById("msg").value);
