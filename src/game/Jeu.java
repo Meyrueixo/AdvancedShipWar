@@ -8,6 +8,7 @@ public class Jeu {
 	private String idJoueur1;
 	private String idJoueur2;
 	private boolean spectateurAutorise;
+	public boolean enVie = true;
 	
 	public Jeu() {
 		// TODO Auto-generated constructor stub

@@ -5,17 +5,16 @@
     <body>
 	    <p> Identifient du jeu   
 	    	<div id="idJeu"><% String IdJeu = (String) request.getAttribute("IdJeu");
-		            out.println( IdJeu );
+		            out.print( IdJeu );
 	        %></div>
 	        
 	        Identifient du Client :  
 	        <div id="idClient">
 	            <% String IdSession = (String) request.getAttribute("IdSession");
-	            	out.print("Id Session :");
-		            out.println( IdSession );
+		            out.print( IdSession );
 	            %>
             </div>
-               <textarea id="chatlog" readonly></textarea><br/>
+               <textarea id="chatlog" readonly style="margin: 0px; height: 110px; width: 477px;"></textarea><br/>
 		        <textarea id="msg" type="text"  width="500" height="50"/></textarea>
 		        <button type="submit" id="sendButton" onClick="postToServer()">Send Json!</button>
 		        <button type="submit" id="sendButton" onClick="closeConnect()">End connection</button>

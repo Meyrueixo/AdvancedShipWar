@@ -1,6 +1,6 @@
-
+var idJeu = document.getElementById('idJeu').textContent;
+var idJoueur = document.getElementById('idClient').textContent;
 var plateauAdversaire = creationPlateau('PlateauAdversaire');
-
 var plateauMaison = creationPlateau('PlateauMaison');
 var info = document.getElementById('info');
 var infoserv = document.getElementById('infoserv');
@@ -142,8 +142,13 @@ function render(Plateau){
 /*--------------------web sockect -----------*/
 var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame");
 ws.onopen = function(){
-
+	connexionPartie();
 };
+function connexionPartie(){
+	var connect = {idgame: idJeu,TokenPlayer:idJoueur };
+	sendJson("connect", connect);
+	
+}
 /*reception message*/
 ws.onmessage = function(message){
 	document.getElementById("chatlog").textContent += message.data + "\n";

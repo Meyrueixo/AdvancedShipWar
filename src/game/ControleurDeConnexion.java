@@ -1,17 +1,21 @@
 package game;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import bean.InfoJeuBean;
 
 public class ControleurDeConnexion {
 	
 	
-	private List<Jeu> listeJeu;
-	
+	protected List<Jeu> listeJeu;
+	Timer timer = new Timer();
+	 ActionClear action ;
 	
 	private static ControleurDeConnexion instance;
 	
@@ -21,7 +25,8 @@ public class ControleurDeConnexion {
 		}
 		return instance;
 	}
-	public String creationPartie(String Token , String nomParti, String idJoueur1){
+	
+	public synchronized String creationPartie(String Token , String nomParti, String idJoueur1){
 		String idPartie = existeJoueur(idJoueur1);
 		if(idPartie == null){
 			Jeu monJeu =new Jeu(Token,nomParti, idJoueur1);
@@ -33,7 +38,7 @@ public class ControleurDeConnexion {
 
 	}
 	
-	public Jeu connexion(String idJeu,ClientWebSocket client){
+	public synchronized Jeu connexion(String idJeu,ClientWebSocket client){
 		Jeu instanceJeu = recherche(idJeu);
 		
 		if(instanceJeu == null){
@@ -68,11 +73,12 @@ public class ControleurDeConnexion {
 			instanceJeu = ((Jeu)it.next());
 			if(Token.equals(instanceJeu.token)){
 				trouver = true;
+				return instanceJeu;
 			}	
 		}
-		return instanceJeu;
+		return null;
 	}
-	public String existeJoueur(String idJoueur){
+	public synchronized String existeJoueur(String idJoueur){
 		Jeu instanceJeu = null;
 		boolean trouver = false;
 		String idPartie = null;
@@ -87,10 +93,13 @@ public class ControleurDeConnexion {
 		}
 		return idPartie ;
 	}
+	
 
 	private ControleurDeConnexion() {
 		listeJeu = new ArrayList<Jeu>();
+		action = new  ActionClear(listeJeu);
 		// TODO Auto-generated constructor stub
+		timer.scheduleAtFixedRate(action,((long)( 1*60*1000)), ((long)( 1*60*1000)));
 	}
 
 }

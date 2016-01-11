@@ -27,6 +27,7 @@ public class ClientWebSocket {
     private final String nickname;
     private Session session;
     private String TokenPlayer;
+    private boolean estJoueur;
     public Jeu monjeu;
     private ControleurDeConnexion controleCon =  ControleurDeConnexion.GETINSTANCE();
     
@@ -39,7 +40,7 @@ public class ClientWebSocket {
     public void start(Session session) {
         this.setSession(session);
         connections.add(this);
-        String message = String.format("* %s %s %s", nickname, "has joined.",this.getSession().getContainer().toString());
+        String message = String.format("* %s %s", nickname, "has joined.");
         broadcast(message);
     }
 
@@ -56,13 +57,16 @@ public class ClientWebSocket {
     @OnMessage
     public void incoming(String message) {
         // Never trust the client
+
     	String filteredMessage = message;
     	try {
     		
         	JSONObject obj = new JSONObject(message);
         	if(obj.has("connect")){
         		String idgame = obj.getJSONObject("connect").getString("idgame");
+        		TokenPlayer = obj.getJSONObject("connect").getString("TokenPlayer");
         		monjeu = controleCon.connexion(idgame, this);
+        		
         		if(monjeu !=null){
         			filteredMessage = String.format("nom de la partie : %s: %s",monjeu.nomDeLaPartie,monjeu.getToken());
         		}
@@ -71,7 +75,9 @@ public class ClientWebSocket {
 		} catch (Exception e) {
 			filteredMessage ="Donnée invalide";
 		}
-    	
+    	if(monjeu !=null){
+    		monjeu.enVie = true;
+    	}
         
         broadcast(filteredMessage);
     }
