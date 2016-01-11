@@ -153,7 +153,7 @@ function connexionPartie(){
 ws.onmessage = function(message){
 	document.getElementById("chatlog").textContent += message.data + "\n";
 };
-
+/*creation du json*/
 function sendJson(typeObjet, objet){
 	var messformat = ("{ \""+typeObjet+"\":"+JSON.stringify(objet)+"}");
 	sendMessage(messformat);
