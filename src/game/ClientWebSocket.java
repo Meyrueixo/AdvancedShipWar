@@ -52,25 +52,17 @@ public class ClientWebSocket {
                 nickname, "has disconnected.");
         broadcast(message);
     }
-
-
-    @OnMessage
-    public void incoming(String message) {
-        // Never trust the client
-
-    	String filteredMessage = message;
+    private void traitementJson(String Json){
+    	
+    	String filteredMessage = "";
     	try {
-    		
-        	JSONObject obj = new JSONObject(message);
+    		JSONObject obj = new JSONObject(Json);
+    		if(obj.has("chat")){
+    			traitementChat(obj);
+    		}
+        	
         	if(obj.has("connect")){
-        		String idgame = obj.getJSONObject("connect").getString("idgame");
-        		TokenPlayer = obj.getJSONObject("connect").getString("TokenPlayer");
-        		monjeu = controleCon.connexion(idgame, this);
-        		
-        		if(monjeu !=null){
-        			filteredMessage = String.format("nom de la partie : %s: %s",monjeu.nomDeLaPartie,monjeu.getToken());
-        		}
-        		
+        		filteredMessage = TraitementConection(filteredMessage, obj);	
         	}
 		} catch (Exception e) {
 			filteredMessage ="Donnée invalide";
@@ -78,12 +70,43 @@ public class ClientWebSocket {
     	if(monjeu !=null){
     		monjeu.enVie = true;
     	}
-        
-        broadcast(filteredMessage);
+    	 broadcast(filteredMessage);
+       
+    	
     }
 
 
+	private String TraitementConection(String filteredMessage, JSONObject obj) {
+		String idgame = obj.getJSONObject("connect").getString("idgame");
+		TokenPlayer = obj.getJSONObject("connect").getString("TokenPlayer");
+		monjeu = controleCon.connexion(idgame, this);
+		
+		if(monjeu !=null){
+			JSONObject json = new JSONObject();
+			json.accumulate("connection",String.format("nom de la partie : %s: %s",monjeu.nomDeLaPartie,monjeu.getToken()));
+			 
+			filteredMessage = json.toString();
+		}
+		return filteredMessage;
+	}
 
+
+	private void traitementChat(JSONObject obj) {
+		String text = obj.getJSONObject("chat").getString("message");
+		String destination = obj.getJSONObject("chat").getString("destinataire");
+		if(destination.equals("tous")){
+			JSONObject json = new JSONObject();
+			json.accumulate("chat", PLAYER_PREFIX +" : "+ text);
+			 broadcast(json.toString());
+		}
+	}
+
+    @OnMessage
+    public void incoming(String message) {
+        // Never trust the client
+    	this.traitementJson(message);
+  
+    }
 
     @OnError
     public void onError(Throwable t) throws Throwable {

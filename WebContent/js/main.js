@@ -71,7 +71,9 @@ function eventSurPlateau(event,Plateau){
 	});
 
 }
-	
+function getBlaze(){
+	//TODO blaze
+}
 
 
 
@@ -135,9 +137,12 @@ function render(Plateau){
 	Plateau.elements.forEach(function(element){	
 		renderBis(element,Plateau);	
 	});
-		
-		
-	
+}
+function MessageChat(){
+ var text =	document.getElementById("msgChat").value;
+ var chat = {message: text,destinataire:"tous"};
+	sendJson("chat", chat);
+ 
 }
 /*--------------------web sockect -----------*/
 var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame");
@@ -151,7 +156,15 @@ function connexionPartie(){
 }
 /*reception message*/
 ws.onmessage = function(message){
-	document.getElementById("chatlog").textContent += message.data + "\n";
+	try{
+		var objectJson = JSON.parse(message.data);
+		if(objectJson.hasOwnProperty("chat")){
+			document.getElementById("chatlog").textContent += objectJson.chat + "\n";
+		}
+	}catch(exection){
+		document.getElementById("consolLog").textContent += message.data + "\n";
+	}
+	
 };
 /*creation du json*/
 function sendJson(typeObjet, objet){
@@ -167,7 +180,7 @@ function sendMessage(message){
 
 //propre a la console de debug
 function postToServer(){
-	sendMessage(document.getElementById("msg").value);
+	sendMessage(document.getElementById("consolMsg").value);
 	document.getElementById("msg").value = "";
 }
 function closeConnect(){
