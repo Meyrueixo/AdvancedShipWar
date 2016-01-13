@@ -75,7 +75,7 @@ public class ControleurDeConnexion {
 		return ok;
 	}
 	
-	public Jeu recherche(String Token){
+	public synchronized  Jeu recherche(String Token){
 		Jeu instanceJeu = null;
 		boolean trouver = false;
 		Iterator it =listeJeu.iterator();
