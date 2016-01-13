@@ -4,9 +4,10 @@ var plateauAdversaire = creationPlateau('PlateauAdversaire');
 var plateauMaison = creationPlateau('PlateauMaison');
 var info = document.getElementById('info');
 var infoserv = document.getElementById('infoserv');
+var boutonMarquer = document.getElementById('boutonMarquer');
+var caseTemp =null;
 
-
-function creationPlateau( idPlateau){
+function creationPlateau(idPlateau){
 	/** constructeur de plateau pour simplifier */
 	var canvas = document.getElementById(idPlateau);
 	var Plateau = {	zone: canvas ,
@@ -15,7 +16,8 @@ function creationPlateau( idPlateau){
 			taillex : canvas.getAttribute('width')/10,
 			tailley : canvas.getAttribute('height')/10,
 			context : canvas.getContext('2d'),
-			elements : []
+			elements : [],
+			nomPlateau : idPlateau
 	};
 	var compt = 1;
 	for(i = 0;i <10;i ++){
@@ -49,24 +51,15 @@ plateauMaison.zone.addEventListener('click', function(event){eventSurPlateau(eve
 function eventSurPlateau(event,Plateau){
 	var x = (event.layerX ),
 	y = (event.layerY);
-	var caseActu;
 	infoserv.textContent = (" x : " + x + " y : "+y);
 	// Collision detection between clicked offset and element.
 	Plateau.elements.forEach(function(element) {
 		if (y > element.top && y < element.top + element.height
 				&& x > element.left && x < element.left + element.width) {
-			
-			info.textContent = ("element selectioner " + element.name +"   eventy :"+ event.pageY+"   eventx:  " + x +
+			selectCase(element);
+			//Plateau.caseActu = element;
+			info.textContent = ("Plateau selectionne : "+Plateau.nomPlateau+" Element selectioner : " + element.name +" eventy :"+ event.pageY+" eventx : " + x +
 					" x :"+x + " y :"+ y +" Plateau elemLeft :"+Plateau.elemLeft +" Plateau elemTop :"+Plateau.elemTop);
-			if (element.etat != 'marque'){
-				element.etat = 'actif';
-			}else{
-				element.etat = 'inactif';
-			}
-			//request(readData);
-			/*if(element.type === 'mine')*/
- 
-			render(Plateau);
 		}
 	});
 
@@ -74,31 +67,50 @@ function eventSurPlateau(event,Plateau){
 function getBlaze(){
 	//TODO blaze
 }
-
+function selectCase(element){	
+	if (caseTemp !=null){
+			caseTemp.etat = 'inactif';
+			element.etat = 'actif';
+			caseTemp = element;
+			render(plateauMaison);
+			render(plateauAdversaire);
+		
+	}
+	else{
+		element.etat = 'actif';
+		caseTemp = element;
+		render(plateauMaison);
+		render(plateauAdversaire);
+	}
+	// etat actif + rendu du plateau actu
+	// etat inactif ancienne case / rendu autre plateau
+}
 
 
 render(plateauAdversaire);
 render(plateauMaison);
 
 function poserMine(){
-	if(caseActu.type === 'mine')
+	if(caseTemp.type === 'mine')
 	{
 		alert("Une mine est déjà posée ici");
 	}else{
-		caseActu.type = 'mine'
+		caseTemp.type = 'mine'
 	}
 	render();
 }
 
-function marquerCase(){
-	if(caseActu.etat === 'marque')
+function marquerCase(Plateau){
+	if(Plateau.caseActu.etat === 'marque')
 	{
-		caseActu.etat = 'inactif';
+		Plateau.caseActu.etat = 'inactif';
 	}else{
-		if (caseActu.type != 'mine')
-			caseActu.etat = 'marque';
+		if (Plateau.caseActu.type != 'mine')
+			Plateau.caseActu.etat = 'marque';
 	}
-	render();
+
+	
+	render(Plateau)
 }
 
 function renderBis(element, Plateau){
@@ -107,17 +119,17 @@ function renderBis(element, Plateau){
 		Plateau.context.fillStyle = '#0500FF';
 		Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 	}else{
-		if (element.etat === 'actif'){
-			Plateau.context.fillStyle = '#008000';
-			Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-		}
+		if (element.etat == 'actif'){
+				Plateau.context.fillStyle = '#008000';
+				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+			}
 		else{
 			if (element.etat === 'marque'){
 				Plateau.context.fillStyle = '#FF0000';
 				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 			}
 			else {
-				Plateau.context.fillStyle = element.colour;
+				Plateau.context.fillStyle = '#05EFFF';
 				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 			}
 

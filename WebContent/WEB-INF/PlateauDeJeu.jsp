@@ -40,7 +40,7 @@
 	</div>
 
 	<button onclick="poserMine();">Poser une mine</button>
-	<button onclick="marquerCase();">Marquer case</button>
+	<button id="boutonMarquer">Marquer case</button>
 
 	<div>
 		<textarea id="chatlog" readonly
