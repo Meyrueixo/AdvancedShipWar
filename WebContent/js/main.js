@@ -32,7 +32,8 @@ function creationPlateau(idPlateau){
 				left: (Plateau.tailley*j),
 				name : compt,
 				type : 'vide',
-				etat : 'inactif'
+				etat : 'inactif',
+				select : 'non'
 			});
 			compt++;
 		}
@@ -44,8 +45,9 @@ function creationPlateau(idPlateau){
 
 //Add event listener for `click` events.
 plateauAdversaire.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauAdversaire);}, false);
-
 plateauMaison.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauMaison);}, false);
+boutonMarquer.addEventListener('click',marquerCase,false);
+
 
 
 function eventSurPlateau(event,Plateau){
@@ -69,15 +71,15 @@ function getBlaze(){
 }
 function selectCase(element){	
 	if (caseTemp !=null){
-			caseTemp.etat = 'inactif';
-			element.etat = 'actif';
+			caseTemp.select = 'non';
+			element.select = 'oui';
 			caseTemp = element;
 			render(plateauMaison);
 			render(plateauAdversaire);
 		
 	}
 	else{
-		element.etat = 'actif';
+		element.select = 'oui';
 		caseTemp = element;
 		render(plateauMaison);
 		render(plateauAdversaire);
@@ -100,17 +102,18 @@ function poserMine(){
 	render();
 }
 
-function marquerCase(Plateau){
-	if(Plateau.caseActu.etat === 'marque')
-	{
-		Plateau.caseActu.etat = 'inactif';
-	}else{
-		if (Plateau.caseActu.type != 'mine')
-			Plateau.caseActu.etat = 'marque';
+function marquerCase(event){
+	if (caseTemp.etat === 'marque'){
+		caseTemp.select = 'non';
+		caseTemps.etat = 'inactif';
 	}
-
+	else{
+		caseTemp.etat = 'marque';
+		caseTemp.select = 'non';
+	}
 	
-	render(Plateau)
+	render(plateauAdversaire);
+	render(plateauMaison);
 }
 
 function renderBis(element, Plateau){
@@ -119,7 +122,7 @@ function renderBis(element, Plateau){
 		Plateau.context.fillStyle = '#0500FF';
 		Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 	}else{
-		if (element.etat == 'actif'){
+		if (element.select == 'oui'){
 				Plateau.context.fillStyle = '#008000';
 				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 			}
