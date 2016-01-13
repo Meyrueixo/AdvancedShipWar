@@ -63,8 +63,19 @@ public class ControleurDeConnexion {
 		}
 		return infos;
 	}
+	public boolean ajoutJoueur(String idGame,String idJoueur){
+		boolean ok =  false;
+		Jeu instance = recherche(idGame);
+		if(instance != null){
+			if(instance.getIdJoueur2() == null){
+				instance.setIdJoueur2(idJoueur);
+				ok = true;
+			}
+		}
+		return ok;
+	}
 	
-	public Jeu recherche(String Token){
+	public synchronized  Jeu recherche(String Token){
 		Jeu instanceJeu = null;
 		boolean trouver = false;
 		Iterator it =listeJeu.iterator();

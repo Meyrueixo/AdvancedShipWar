@@ -27,6 +27,8 @@
 		  	}
             	
             %>
+           	 	<input type="radio" name="Jouer" value="true">Jouer
+           	 	<input type="radio" name="Jouer" value="false">Regarder
 			  <input type="submit" value="Submit">
 		</form>
 		<p> Crée une partie</p>

@@ -1,10 +1,5 @@
 package game;
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -20,11 +15,9 @@ public class ClientWebSocket {
 
 	private static final String PLAYER_PREFIX = "Joueur";
 	private static final String GUEST_PREFIX = "Spectateur";
-    private static final AtomicInteger connectionIds = new AtomicInteger(0);
-    private static final Set<ClientWebSocket> connections =
-            new CopyOnWriteArraySet<>();
 
-    private final String nickname;
+
+    private String nickname;
     private Session session;
     private String TokenPlayer;
     private boolean estJoueur;
@@ -32,35 +25,33 @@ public class ClientWebSocket {
     private ControleurDeConnexion controleCon =  ControleurDeConnexion.GETINSTANCE();
     
     public ClientWebSocket() {
-        nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
+        nickname = GUEST_PREFIX;
     }
 
 
     @OnOpen
     public void start(Session session) {
         this.setSession(session);
-        connections.add(this);
-        String message = String.format("* %s %s", nickname, "has joined.");
-        broadcast(message);
+        
     }
 
 
     @OnClose
     public void end() {
-        connections.remove(this);
+    	monjeu.getListeConnections().remove(this);
         String message = String.format("* %s %s",
-                nickname, "has disconnected.");
-        broadcast(message);
+                getNickname(), "has disconnected.");
+        monjeu.broadcast(message);
     }
+    
     private void traitementJson(String Json){
     	
     	String filteredMessage = "";
     	try {
     		JSONObject obj = new JSONObject(Json);
-    		if(obj.has("chat")){
+    		if(obj.has("chat") && monjeu != null){
     			traitementChat(obj);
     		}
-        	
         	if(obj.has("connect")){
         		filteredMessage = TraitementConection(filteredMessage, obj);	
         	}
@@ -69,8 +60,9 @@ public class ClientWebSocket {
 		}
     	if(monjeu !=null){
     		monjeu.enVie = true;
+    		monjeu.broadcast(filteredMessage);
     	}
-    	 broadcast(filteredMessage);
+    	 
        
     	
     }
@@ -84,7 +76,16 @@ public class ClientWebSocket {
 		if(monjeu !=null){
 			JSONObject json = new JSONObject();
 			json.accumulate("connection",String.format("nom de la partie : %s: %s",monjeu.nomDeLaPartie,monjeu.getToken()));
-			 
+			monjeu.getListeConnections().add(this);
+			if(monjeu.getIdJoueur1().equals(TokenPlayer)){
+				monjeu.setJoueur1(this);
+				this.nickname = this.PLAYER_PREFIX;
+			}else if(monjeu.getIdJoueur2().equals(TokenPlayer)){
+				monjeu.setJoueur2(this);
+				this.nickname = this.PLAYER_PREFIX;
+			}
+	        String message = String.format("* %s %s %s %s", getNickname(), "has joined.",monjeu.getIdJoueur1(),monjeu.getIdJoueur2());
+	        monjeu.broadcast(message);
 			filteredMessage = json.toString();
 		}
 		return filteredMessage;
@@ -96,8 +97,8 @@ public class ClientWebSocket {
 		String destination = obj.getJSONObject("chat").getString("destinataire");
 		if(destination.equals("tous")){
 			JSONObject json = new JSONObject();
-			json.accumulate("chat", PLAYER_PREFIX +" : "+ text);
-			 broadcast(json.toString());
+			json.accumulate("chat",this.getNickname() +" : "+ text);
+			monjeu.broadcast(json.toString());
 		}
 	}
 
@@ -113,28 +114,7 @@ public class ClientWebSocket {
         System.err.println("Chat Error: " + t.toString() + " " + t);
     }
 
-//pour test
-    private static void broadcast(String msg) {
-        for (ClientWebSocket client : connections) {
-            try {
-                synchronized (client) {
-                    client.getSession().getBasicRemote().sendText(msg);
-                }
-            } catch (IOException e) {
-                //log.debug("Chat Error: Failed to send message to client", e);
-                connections.remove(client);
-                try {
-                    client.getSession().close();
-                } catch (IOException e1) {
-                    // Ignore
-                }
-                String message = String.format("* %s %s",
-                        client.nickname, "has been disconnected.");
-                broadcast(message);
-            }
-        }
-    }
-
+  
 
 	public Session getSession() {
 		return session;
@@ -143,6 +123,11 @@ public class ClientWebSocket {
 
 	private void setSession(Session session) {
 		this.session = session;
+	}
+
+
+	public String getNickname() {
+		return nickname;
 	}
 
 }
