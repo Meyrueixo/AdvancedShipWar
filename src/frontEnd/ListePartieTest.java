@@ -43,8 +43,16 @@ public class ListePartieTest extends HttpServlet {
 			 public  void doPost(HttpServletRequest request, HttpServletResponse response)
 			 throws ServletException, IOException  {
 				 if(((String)request.getParameter("Game")) != null){
-					 
-					 PageJeu(request,  response,request.getParameter("Game"));
+					 String jouer = ((String)request.getParameter("Jouer"));
+					 if( jouer != null && jouer.equals("true")){
+						 HttpSession session = request.getSession();
+						 controleCon.ajoutJoueur(request.getParameter("Game"), session.getId());
+						 PageJeu(request, response,request.getParameter("Game"));
+						 
+					 }else{
+						 PageJeu(request, response,request.getParameter("Game"));
+					 }
+						 
 			 		
 				 }else if (((String)request.getParameter("Create")) != null){
 					 //TODO bug nouvelle cr�ation de partie a chaque F5 
