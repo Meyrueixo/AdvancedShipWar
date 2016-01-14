@@ -46,7 +46,7 @@ public class ClientWebSocket {
     
     private void traitementJson(String Json){
     	
-    	String filteredMessage = "";
+    	String filteredMessage = Json;
     	try {
     		JSONObject obj = new JSONObject(Json);
     		if(obj.has("chat") && monjeu != null){
@@ -56,7 +56,7 @@ public class ClientWebSocket {
         		filteredMessage = TraitementConection(filteredMessage, obj);	
         	}
 		} catch (Exception e) {
-			filteredMessage ="Donnée invalide";
+			filteredMessage ="Donnï¿½e invalide";
 		}
     	if(monjeu !=null){
     		monjeu.enVie = true;

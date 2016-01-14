@@ -39,7 +39,7 @@
 		</div>
 	</div>
 
-	<button onclick="poserMine();">Poser une mine</button>
+	<button id="boutonPoserMine">Poser une mine</button>
 	<button id="boutonMarquer">Marquer case</button>
 
 	<div>

@@ -5,6 +5,7 @@ var plateauMaison = creationPlateau('PlateauMaison');
 var info = document.getElementById('info');
 var infoserv = document.getElementById('infoserv');
 var boutonMarquer = document.getElementById('boutonMarquer');
+var boutonPoserMine = document.getElementById('boutonPoserMine');
 var caseTemp =null;
 
 function creationPlateau(idPlateau){
@@ -47,6 +48,7 @@ function creationPlateau(idPlateau){
 plateauAdversaire.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauAdversaire);}, false);
 plateauMaison.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauMaison);}, false);
 boutonMarquer.addEventListener('click',marquerCase,false);
+boutonPoserMine.addEventListener('click',poserMine,false);
 
 
 
@@ -92,14 +94,15 @@ function selectCase(element){
 render(plateauAdversaire);
 render(plateauMaison);
 
-function poserMine(){
+function poserMine(event){
 	if(caseTemp.type === 'mine')
 	{
 		alert("Une mine est déjà posée ici");
 	}else{
-		caseTemp.type = 'mine'
+		var mine = caseTemp.name;
+		sendJson("mine", mine);
 	}
-	render();
+	render(plateauAdversaire);
 }
 
 function marquerCase(event){
@@ -178,6 +181,10 @@ ws.onmessage = function(message){
 		var objectJson = JSON.parse(message.data);
 		if(objectJson.hasOwnProperty("chat")){
 			document.getElementById("chatlog").textContent += objectJson.chat + "\n";
+		}
+		if(objectJson.hasOwnProperty("mine")){
+			plateauAdversaire.elements[objectJson.mine.idCase].type = 'mine';
+			render(plateauAdversaire);
 		}
 	}catch(exection){
 		document.getElementById("consolLog").textContent += message.data + "\n";
