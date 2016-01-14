@@ -103,17 +103,20 @@ function poserMine(){
 }
 
 function marquerCase(event){
-	if (caseTemp.etat === 'marque'){
-		caseTemp.select = 'non';
-		caseTemps.etat = 'inactif';
+	if (caseTemp !=null){
+		if (caseTemp.etat === 'marque'){
+			caseTemp.etat = 'inactif';
+			caseTemp.select = 'non';
+			caseTemp= null;
+		}
+		else{
+			caseTemp.etat = 'marque';
+			caseTemp.select = 'non';
+			caseTemp=null;
+		}
+		render(plateauAdversaire);
+		render(plateauMaison);
 	}
-	else{
-		caseTemp.etat = 'marque';
-		caseTemp.select = 'non';
-	}
-	
-	render(plateauAdversaire);
-	render(plateauMaison);
 }
 
 function renderBis(element, Plateau){
