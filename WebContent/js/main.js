@@ -6,6 +6,7 @@ var info = document.getElementById('info');
 var infoserv = document.getElementById('infoserv');
 var boutonMarquer = document.getElementById('boutonMarquer');
 var boutonPoserMine = document.getElementById('boutonPoserMine');
+var boutonTirerMissile = document.getElementById('boutonTirerMissile');
 var caseTemp =null;
 
 function creationPlateau(idPlateau){
@@ -20,7 +21,7 @@ function creationPlateau(idPlateau){
 			elements : [],
 			nomPlateau : idPlateau
 	};
-	var compt = 1;
+	var compt = 0;
 	for(i = 0;i <10;i ++){
 
 		for(j = 0;j <10;j ++){
@@ -49,6 +50,7 @@ plateauAdversaire.zone.addEventListener('click', function(event){eventSurPlateau
 plateauMaison.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauMaison);}, false);
 boutonMarquer.addEventListener('click',marquerCase,false);
 boutonPoserMine.addEventListener('click',poserMine,false);
+boutonTirerMissile.addEventListener('click',tirerMissile,false);
 
 
 
@@ -100,9 +102,18 @@ function poserMine(event){
 		alert("Une mine est déjà posée ici");
 	}else{
 		var mine = caseTemp.name;
+		caseTemp.select = 'non';
 		sendJson("mine", mine);
 	}
 	render(plateauAdversaire);
+}
+
+function tirerMissile(event){
+	if (caseTemp != null){
+		var idCase = caseTemp.name;
+		caseTemp.select = 'non';
+		sendJson("tir",idCase);
+	}
 }
 
 function marquerCase(event){
@@ -123,15 +134,16 @@ function marquerCase(event){
 }
 
 function renderBis(element, Plateau){
-	if(element.type == 'mine')
-	{
-		Plateau.context.fillStyle = '#0500FF';
+	if (element.select == 'oui'){
+		Plateau.context.fillStyle = '#008000';
 		Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-	}else{
-		if (element.select == 'oui'){
-				Plateau.context.fillStyle = '#008000';
-				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-			}
+	}
+	else{
+		if(element.type == 'mine')
+		{
+			Plateau.context.fillStyle = '#0500FF';
+			Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+		}
 		else{
 			if (element.etat === 'marque'){
 				Plateau.context.fillStyle = '#FF0000';
@@ -183,8 +195,11 @@ ws.onmessage = function(message){
 			document.getElementById("chatlog").textContent += objectJson.chat + "\n";
 		}
 		if(objectJson.hasOwnProperty("mine")){
-			plateauAdversaire.elements[objectJson.mine.idCase].type = 'mine';
+			plateauAdversaire.elements[objectJson.mine].type = 'mine';
 			render(plateauAdversaire);
+		}
+		if(objectJson.hasOwnProperty("tir")){
+			document.getElementById("chatlog").textContent += objectJson.tir + "\n"
 		}
 	}catch(exection){
 		document.getElementById("consolLog").textContent += message.data + "\n";

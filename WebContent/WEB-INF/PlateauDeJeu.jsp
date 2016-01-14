@@ -41,6 +41,7 @@
 
 	<button id="boutonPoserMine">Poser une mine</button>
 	<button id="boutonMarquer">Marquer case</button>
+	<button id="boutonTirerMissile">Tirer un missile</button>
 
 	<div>
 		<textarea id="chatlog" readonly
