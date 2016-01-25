@@ -26,7 +26,7 @@ public class Joueur implements I_Joueur{
 		monjeu.getListeConnections().remove(this);
 		String message = String.format("* %s %s",
 				getNickname(), "has disconnected.");
-		monjeu.broadcast(message);
+		monjeu.broadcast(message,true);
 
 	}
 
@@ -45,13 +45,30 @@ public class Joueur implements I_Joueur{
 
 	@Override
 	public void incoming(JSONObject message) {
-		if( message.has("chat") && monjeu != null){
-			traitementChat( message);
-		}
-		if(monjeu !=null){
+		if(monjeu != null){
+			try {	
+				if( message.has("chat") ){
+					traitementChat( message);
+				}
+				if( message.has("mine") ){
+					monjeu.broadcast(message.toString(),false);
+					
+					this.send(message.toString());
+				}
+				if( message.has("tir") ){
+					monjeu.broadcast(message.toString(),false);
+
+					this.send(message.toString());
+
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			monjeu.enVie = true;
-			//monjeu.broadcast(filteredMessage);
+
 		}
+
 
 	}
 
@@ -97,7 +114,7 @@ public class Joueur implements I_Joueur{
 		if(destination.equals("tous")){
 			JSONObject json = new JSONObject();
 			json.accumulate("chat",this.getNickname() +" : "+ text);
-			monjeu.broadcast(json.toString());
+			monjeu.broadcast(json.toString(),true);
 		}
 	}
 

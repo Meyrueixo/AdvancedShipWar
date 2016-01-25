@@ -58,7 +58,7 @@ public class ControleurDeConnexion {
 				participant = new Joueur(instanceJeu,client);
 				instanceJeu.setJoueur1(((I_Joueur)participant));
 				
-			}else if(instanceJeu.getIdJoueur2().equals(idJoueur)){
+			}else if(instanceJeu.getIdJoueur2() != null && instanceJeu.getIdJoueur2().equals(idJoueur)){
 				//TODO factory
 				participant = new Joueur(instanceJeu,client);
 				instanceJeu.setJoueur2((I_Joueur) participant);

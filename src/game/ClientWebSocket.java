@@ -37,7 +37,11 @@ public class ClientWebSocket {
 
     @OnClose
     public void end() {
-    	participant.end();
+    	if(participant != null)
+    	{
+    		participant.end();
+    	}
+    	
     }
     
     private void traitementJson(String Json){

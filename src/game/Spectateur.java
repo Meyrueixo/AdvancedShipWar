@@ -27,7 +27,7 @@ public class Spectateur implements I_Participant{
 		monjeu.getListeConnections().remove(this);
 		String message = String.format("* %s %s",
 				getNickname(), "has disconnected.");
-		monjeu.broadcast(message);	
+		monjeu.broadcast(message,true);	
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class Spectateur implements I_Participant{
 		if(destination.equals("tous")){
 			JSONObject json = new JSONObject();
 			json.accumulate("chat",this.getNickname() +" : "+ text);
-			monjeu.broadcast(json.toString());
+			monjeu.broadcast(json.toString(),true);
 		}
 	}
 

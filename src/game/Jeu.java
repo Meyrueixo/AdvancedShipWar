@@ -65,7 +65,7 @@ public class Jeu {
 	}
 	
 	public void finDePartie(){
-		broadcast("{\"info\":\"Partie Terminer\"}");
+		broadcast("{\"info\":\"Partie Terminer\"}",true);
 		 for (I_Participant client : connections) {
 			 try {
 				client.close();
@@ -78,11 +78,14 @@ public class Jeu {
 		
 	}
 	
-	public void broadcast(String msg) {
+	public void broadcast(String msg ,  boolean tous) {
 	        for (I_Participant client : connections) {
 	            try {
 	                synchronized (client) {
-	                	client.send(msg);
+	                	if(!client.getClass().equals(Joueur.class) || tous){
+	                		client.send( msg);
+	                	}
+	                	
 	                    //client.getSession().getBasicRemote().sendText(msg);
 	                }
 	            } catch (IOException e) {
@@ -95,7 +98,7 @@ public class Jeu {
 	                }
 	                String message = String.format("* %s %s",
 	                        client.getNickname(), "has been disconnected.");
-	                broadcast(message);
+	                broadcast(message,true);
 	            }
 	        }
 	    }
@@ -130,7 +133,7 @@ public class Jeu {
 		
        String message = String.format("* %s %s %s %s", part.getNickname(), "has joined.",getIdJoueur1(),getIdJoueur2());
 
-       broadcast(message);
+       broadcast(message,true);
 	}
 
 }
