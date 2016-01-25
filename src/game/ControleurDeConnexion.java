@@ -38,7 +38,7 @@ public class ControleurDeConnexion {
 
 	}
 	
-	public synchronized Jeu connexion(String idJeu,ClientWebSocket client){
+	public synchronized I_Participant connexion(String idJeu,String idJoueur, ClientWebSocket client){
 		Jeu instanceJeu = recherche(idJeu);
 		
 		if(instanceJeu == null){
@@ -52,7 +52,21 @@ public class ControleurDeConnexion {
 			}
 			return null;
 		}else{
-			return instanceJeu;
+			I_Participant participant ;
+			if(instanceJeu.getIdJoueur1().equals(idJoueur)){
+			//TODO factory
+				participant = new Joueur(instanceJeu,client);
+				instanceJeu.setJoueur1(((I_Joueur)participant));
+				
+			}else if(instanceJeu.getIdJoueur2().equals(idJoueur)){
+				//TODO factory
+				participant = new Joueur(instanceJeu,client);
+				instanceJeu.setJoueur2((I_Joueur) participant);
+			}else{
+				participant = new Spectateur(instanceJeu,client);
+			}
+			instanceJeu.ajoutParticipant(participant);
+			return  participant;
 		}
 			
 	}

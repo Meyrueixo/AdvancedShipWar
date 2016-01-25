@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.json.JSONObject;
+
 public class Jeu {
 	public String token;
 	public String nomDeLaPartie;
@@ -12,12 +14,12 @@ public class Jeu {
 	private int nbJoueurEnCour;
 	private String idJoueur1;
 	private String idJoueur2;
-	private ClientWebSocket Joueur1;
-	private ClientWebSocket Joueur2;
+	private I_Joueur Joueur1;
+	private I_Joueur Joueur2;
 	private boolean spectateurAutorise;
 	public boolean enVie = true;
     private  AtomicInteger connectionIds = new AtomicInteger(1);
-    private  Set<ClientWebSocket> connections = new CopyOnWriteArraySet<>();
+    private  Set<I_Participant> connections = new CopyOnWriteArraySet<>();
 	
 	public Jeu() {
 		// TODO Auto-generated constructor stub
@@ -54,27 +56,28 @@ public class Jeu {
 		this.idJoueur2 = id;
 	}
 
-	public Set<ClientWebSocket> getListeConnections() {
+	public Set<I_Participant> getListeConnections() {
 		return connections;
 	}
 
-	private void setListeConnections(Set<ClientWebSocket> connections) {
+	private void setListeConnections(Set<I_Participant> connections) {
 		this.connections = connections;
 	}
 	
 	public void broadcast(String msg) {
-	        for (ClientWebSocket client : connections) {
+	        for (I_Participant client : connections) {
 	            try {
 	                synchronized (client) {
-	                    client.getSession().getBasicRemote().sendText(msg);
+	                	client.send(msg);
+	                    //client.getSession().getBasicRemote().sendText(msg);
 	                }
 	            } catch (IOException e) {
 	                //log.debug("Chat Error: Failed to send message to client", e);
-	                connections.remove(client);
+	               
 	                try {
-	                    client.getSession().close();
+	                    client.close();
 	                } catch (IOException e1) {
-	                    // Ignore
+	                     connections.remove(client);
 	                }
 	                String message = String.format("* %s %s",
 	                        client.getNickname(), "has been disconnected.");
@@ -83,20 +86,37 @@ public class Jeu {
 	        }
 	    }
 
-	public ClientWebSocket getJoueur1() {
+	public I_Joueur getJoueur1() {
 		return Joueur1;
 	}
 
-	public void setJoueur1(ClientWebSocket joueur1) {
+	public void setJoueur1(I_Joueur joueur1) {
 		Joueur1 = joueur1;
 	}
 
-	public ClientWebSocket getJoueur2() {
+	public I_Joueur getJoueur2() {
 		return Joueur2;
 	}
 
-	public void setJoueur2(ClientWebSocket joueur2) {
+	public void setJoueur2(I_Joueur joueur2) {
 		Joueur2 = joueur2;
+	}
+	
+	public void ajoutParticipant(I_Participant part){
+		this.connections.add(part);
+		
+		JSONObject json = new JSONObject();
+		json.accumulate("connection",String.format("nom de la partie : %s: %s",nomDeLaPartie,getToken()));
+		try {
+			part.send(json.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+       String message = String.format("* %s %s %s %s", part.getNickname(), "has joined.",getIdJoueur1(),getIdJoueur2());
+
+       broadcast(message);
 	}
 
 }

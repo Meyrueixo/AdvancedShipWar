@@ -19,10 +19,9 @@ public class ClientWebSocket {
 
     private String nickname;
     private Session session;
-    private String TokenPlayer;
-    private boolean estJoueur;
-    public Jeu monjeu;
+
     private ControleurDeConnexion controleCon =  ControleurDeConnexion.GETINSTANCE();
+    private I_Participant participant;
     
     public ClientWebSocket() {
         nickname = GUEST_PREFIX;
@@ -38,10 +37,7 @@ public class ClientWebSocket {
 
     @OnClose
     public void end() {
-    	monjeu.getListeConnections().remove(this);
-        String message = String.format("* %s %s",
-                getNickname(), "has disconnected.");
-        monjeu.broadcast(message);
+    	participant.end();
     }
     
     private void traitementJson(String Json){
@@ -49,19 +45,17 @@ public class ClientWebSocket {
     	String filteredMessage = Json;
     	try {
     		JSONObject obj = new JSONObject(Json);
-    		if(obj.has("chat") && monjeu != null){
-    			traitementChat(obj);
-    		}
+        	
         	if(obj.has("connect")){
         		filteredMessage = TraitementConection(filteredMessage, obj);	
+        	}else if(participant != null){
+        		participant.incoming(obj);
         	}
+        	
 		} catch (Exception e) {
 			filteredMessage ="Donn�e invalide";
 		}
-    	if(monjeu !=null){
-    		monjeu.enVie = true;
-    		monjeu.broadcast(filteredMessage);
-    	}
+    	
     	 
        
     	
@@ -70,37 +64,19 @@ public class ClientWebSocket {
 
 	private String TraitementConection(String filteredMessage, JSONObject obj) {
 		String idgame = obj.getJSONObject("connect").getString("idgame");
-		TokenPlayer = obj.getJSONObject("connect").getString("TokenPlayer");
-		monjeu = controleCon.connexion(idgame, this);
+		String idJoueur = obj.getJSONObject("connect").getString("TokenPlayer");
+		participant = controleCon.connexion(idgame,idJoueur, this);
 		
-		if(monjeu !=null){
-			JSONObject json = new JSONObject();
-			json.accumulate("connection",String.format("nom de la partie : %s: %s",monjeu.nomDeLaPartie,monjeu.getToken()));
-			monjeu.getListeConnections().add(this);
-			if(monjeu.getIdJoueur1().equals(TokenPlayer)){
-				monjeu.setJoueur1(this);
-				this.nickname = this.PLAYER_PREFIX;
-			}else if(monjeu.getIdJoueur2().equals(TokenPlayer)){
-				monjeu.setJoueur2(this);
-				this.nickname = this.PLAYER_PREFIX;
-			}
-	        String message = String.format("* %s %s %s %s", getNickname(), "has joined.",monjeu.getIdJoueur1(),monjeu.getIdJoueur2());
-	        monjeu.broadcast(message);
-			filteredMessage = json.toString();
+		if(participant !=null){
+			participant.setIWebSocket(this);
+			
+			filteredMessage = "truc";
 		}
 		return filteredMessage;
 	}
 
 
-	private void traitementChat(JSONObject obj) {
-		String text = obj.getJSONObject("chat").getString("message");
-		String destination = obj.getJSONObject("chat").getString("destinataire");
-		if(destination.equals("tous")){
-			JSONObject json = new JSONObject();
-			json.accumulate("chat",this.getNickname() +" : "+ text);
-			monjeu.broadcast(json.toString());
-		}
-	}
+	
 
     @OnMessage
     public void incoming(String message) {
