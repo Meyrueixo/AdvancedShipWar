@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
+
 
 import bean.InfoJeuBean;
 
@@ -123,7 +123,7 @@ public class ControleurDeConnexion {
 	private ControleurDeConnexion() {
 		listeJeu = new ArrayList<Jeu>();
 		action = new  ActionClear(listeJeu);
-		// TODO Auto-generated constructor stub
+		//execute action clear a interval regulier
 		timer.scheduleAtFixedRate(action,((long)( 1*60*1000)), ((long)( 1*60*1000)));
 	}
 

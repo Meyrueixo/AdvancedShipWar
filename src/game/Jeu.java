@@ -16,8 +16,8 @@ public class Jeu {
 	private String idJoueur2;
 	private I_Joueur Joueur1;
 	private I_Joueur Joueur2;
+	public boolean enVie = true;// plusieur etat 1 = en vie , 0 en at
 	private boolean spectateurAutorise;
-	public boolean enVie = true;
     private  AtomicInteger connectionIds = new AtomicInteger(1);
     private  Set<I_Participant> connections = new CopyOnWriteArraySet<>();
 	
@@ -62,6 +62,20 @@ public class Jeu {
 
 	private void setListeConnections(Set<I_Participant> connections) {
 		this.connections = connections;
+	}
+	
+	public void finDePartie(){
+		broadcast("{\"info\":\"Partie Terminer\"}");
+		 for (I_Participant client : connections) {
+			 try {
+				client.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+		
+		
 	}
 	
 	public void broadcast(String msg) {
