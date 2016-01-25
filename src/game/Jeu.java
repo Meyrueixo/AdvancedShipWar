@@ -14,8 +14,8 @@ public class Jeu {
 	private String idJoueur2;
 	private ClientWebSocket Joueur1;
 	private ClientWebSocket Joueur2;
+	public boolean enVie = true;// plusieur etat 1 = en vie , 0 en at
 	private boolean spectateurAutorise;
-	public boolean enVie = true;
     private  AtomicInteger connectionIds = new AtomicInteger(1);
     private  Set<ClientWebSocket> connections = new CopyOnWriteArraySet<>();
 	
@@ -60,6 +60,19 @@ public class Jeu {
 
 	private void setListeConnections(Set<ClientWebSocket> connections) {
 		this.connections = connections;
+	}
+	public void finDePartie(){
+		broadcast("{\"info\":\"Partie Terminer\"}");
+		 for (ClientWebSocket client : connections) {
+			 try {
+				client.getSession().close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+		
+		
 	}
 	
 	public void broadcast(String msg) {
