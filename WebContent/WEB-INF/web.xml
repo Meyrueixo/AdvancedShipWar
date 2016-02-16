@@ -9,12 +9,12 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  <servlet>
+  	<servlet>
 		 <servlet-name>index</servlet-name>
 		 <servlet-class>frontEnd.ListePartieTest</servlet-class>
-	 </servlet>
+	</servlet>
 	 <servlet-mapping>
 		 <servlet-name>index</servlet-name>
-		 <url-pattern>/index</url-pattern>
+		 <url-pattern>/</url-pattern>
 	 </servlet-mapping>
 </web-app>
