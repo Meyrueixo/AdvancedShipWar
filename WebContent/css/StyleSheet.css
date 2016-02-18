@@ -1,0 +1,21 @@
+﻿#infoPlateau{
+    display:none;
+}
+#debug{
+    display:none;
+}
+.grid{
+	margin-bottom: 15px;
+}
+#plateau1{
+	position: absolute; 
+	left: 0%;
+	width: 50%;
+	height: 100%;
+}
+#plateau2{
+	position: absolute;
+	left: 50%;
+	width: 50%;
+	height: 100%;
+}
