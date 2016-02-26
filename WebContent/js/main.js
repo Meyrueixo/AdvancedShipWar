@@ -172,9 +172,11 @@ function render(Plateau){
 	});
 }
 function MessageChat(){
- var text =	document.getElementById("msgChat").value;
- var chat = {message: text,destinataire:"tous"};
+	var textbox = document.getElementById("msgChat");
+	var text =	textbox.value;
+	var chat = {message: text,destinataire:"tous"};
 	sendJson("chat", chat);
+	textbox.value = "";
  
 }
 /*--------------------web sockect -----------*/

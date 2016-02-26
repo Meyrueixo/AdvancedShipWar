@@ -7,11 +7,12 @@
 		<link rel="stylesheet" href="css/bootstrap.min.css" />
 	    <link rel="stylesheet" href="css/StyleSheet.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	    <title>Le jeu</title>
+	    <title>Advanced Ship War</title>
 	</head>
 	<body>
 		<header> 
 			<h1>Advanced Ship War</h1>
+			<hr/>
 		</header>
 		<section>
 			<div id="infoPlateau">
@@ -33,8 +34,17 @@
 				<p id="info">h</p>
 				<p id="infoserv">h</p>
 			</div>
-		
+			
 			<div class="container-fluid">
+				<div class="row grid">
+					<div class="col-md-1">
+						<p>Timer </p>
+					</div>
+					<div class="col-md-1">
+						<button id="truc">Truc</button>
+						<button id="truc">Truc</button>
+					</div>
+				</div>
 				<div class="row grid">
 					<div class="col-md-6">
 						<canvas id="PlateauAdversaire" width="500" height="500"
@@ -50,10 +60,7 @@
 						<button id="boutonPoserMine">Poser une mine</button>
 						<button id="boutonMarquer">Marquer case</button>
 						<button id="boutonTirerMissile">Tirer un missile</button>
-						<button id="truc">Truc</button>
-						<button id="truc">Truc</button>
-						<button id="truc">Truc</button>
-						<button id="truc">Truc</button>
+						<button id="DeplaceBateau">Deplacer bateau</button>
 					</div>
 				</div>
 				<div class="row grid">
