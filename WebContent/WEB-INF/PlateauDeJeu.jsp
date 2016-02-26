@@ -37,13 +37,24 @@
 			
 			<div class="container-fluid">
 				<div class="row grid">
-					<div class="col-md-1">
-						<p>Timer </p>
+					
+					<div class="col-md-2">
+						<p id="etatJeu">Temps restent : </p>
+						<p id="poinAction">Points d'action :  3</p>
 					</div>
 					<div class="col-md-1">
-						<button id="truc">Truc</button>
-						<button id="truc">Truc</button>
+						<p><input type="radio" name="typeBateau" value="Porte-avion">Porte-avion</p>
+           	 			<p><input type="radio" name="typeBateau" value="croiseur">Croiseur</p>
 					</div>
+					<div class="col-md-1">
+						<p> <input type="radio" name="typeBateau" value="sous-marin">Sous-marin</p>
+           	 			<p><input type="radio" name="typeBateau" value=torpilleur">Torpilleur</p>
+					</div>
+					<div class="col-md-2">
+						<button type="button" class="btn btn-default" aria-label="Left Align" id="direction" >N</button>
+						<button id="PoseBateau">Placer bateau</button>
+					</div>
+				
 				</div>
 				<div class="row grid">
 					<div class="col-md-6">

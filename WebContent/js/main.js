@@ -7,7 +7,67 @@ var infoserv = document.getElementById('infoserv');
 var boutonMarquer = document.getElementById('boutonMarquer');
 var boutonPoserMine = document.getElementById('boutonPoserMine');
 var boutonTirerMissile = document.getElementById('boutonTirerMissile');
+var boutonDirection = document.getElementById('direction');
+var etatJeu = document.getElementById('etatJeu');
+var boutonPoseBateau = document.getElementById('PoseBateau');
+var intervalID;
+
+var mine =  new Image();
+mine.src ='assets/mine.png';
 var caseTemp =null;
+
+
+
+function preparation(){
+	intervalID = setInterval(Timer,999);
+	var dureeCoup= 120;
+	
+	
+}
+
+function stopTimer() {
+	clearInterval(intervalID);
+	etatJeu.innerHTML="terminé";
+	//finDeTour();
+}
+function Timer()
+{
+	var s=dureeCoup;
+	var m=0;
+	var h=0;
+	if(s<0){
+		
+		stopTimer();	
+	}
+	else{
+		if(s>59){
+			m=Math.floor(s/60);
+			s=s-m*60
+		}
+		if(m>59){
+			h=Math.floor(m/60);
+			m=m-h*60
+		}
+		if(s<10){
+			s="0"+s
+		}
+		if(m<10){
+			m="0"+m
+		}
+		etatJeu.innerHTML="Temps restent : "+m+":"+s;
+	}
+	dureeCoup=dureeCoup-1;
+
+
+}
+function finDeTour(){
+	boutonPoserMine.disabled = true;
+	boutonTirerMissile.disabled =true;
+}
+function debutDeTour(){
+	boutonPoserMine.disabled = false;
+	boutonTirerMissile.disabled = false;
+}
 
 function creationPlateau(idPlateau){
 	/** constructeur de plateau pour simplifier */
@@ -35,7 +95,8 @@ function creationPlateau(idPlateau){
 				name : compt,
 				type : 'vide',
 				etat : 'inactif',
-				select : 'non'
+				select : 'non',
+				orientation :'vertical'
 			});
 			compt++;
 		}
@@ -51,8 +112,24 @@ plateauMaison.zone.addEventListener('click', function(event){eventSurPlateau(eve
 boutonMarquer.addEventListener('click',marquerCase,false);
 boutonPoserMine.addEventListener('click',poserMine,false);
 boutonTirerMissile.addEventListener('click',tirerMissile,false);
+boutonDirection.addEventListener('click',changeDirection,false);
+boutonPoseBateau.addEventListener('click',poserBateau,false);
 
-
+function changeDirection(){
+	if(boutonDirection.textContent === 'N'){
+		boutonDirection.textContent = 'E'
+	}
+	else if(boutonDirection.textContent == 'E'){
+		boutonDirection.textContent = 'S'	
+		}
+	else if(boutonDirection.textContent == 'S'){
+		boutonDirection.textContent = 'O'
+	}
+	else if(boutonDirection.textContent =='O'){
+		boutonDirection.textContent = 'N'
+	}
+	
+}
 
 function eventSurPlateau(event,Plateau){
 	var x = (event.layerX ),
@@ -96,14 +173,28 @@ function selectCase(element){
 render(plateauAdversaire);
 render(plateauMaison);
 
+function poserBateau(event){
+	if(caseTemp.type === 'bateau')
+	{
+		alert("Un bateau est déjà posée ici");
+	}else{
+		var bateau = {pos : caseTemp.name,
+					type:'porteavion',
+					oriantation:boutonDirection.textContent
+					};
+		caseTemp.select = 'non';
+		sendJson("bateau",  bateau);
+	}
+}
+
 function poserMine(event){
 	if(caseTemp.type === 'mine')
 	{
 		alert("Une mine est déjà posée ici");
 	}else{
-		var mine = caseTemp.name;
+		var caseMine = caseTemp.name;
 		caseTemp.select = 'non';
-		sendJson("mine", mine);
+		sendJson("mine", caseMine);
 	}
 	render(plateauAdversaire);
 }
@@ -132,28 +223,40 @@ function marquerCase(event){
 		render(plateauMaison);
 	}
 }
+function renduBateau(bateau){
+	
+}
 
 function renderBis(element, Plateau){
+	
 	if (element.select == 'oui'){
 		Plateau.context.fillStyle = '#008000';
 		Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 	}
 	else{
-		if(element.type == 'mine')
-		{
-			Plateau.context.fillStyle = '#0500FF';
-			Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-		}
-		else{
-			if (element.etat === 'marque'){
-				Plateau.context.fillStyle = '#FF0000';
-				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+		if(element.type == 'bateau'){
+			
+				Plateau.context.fillStyle = ' #808080';
+				Plateau.context.fillRect(element.left, element.top, element.width-10, element.height);
+				
+			}else{
+				if(element.type == 'mine')
+				{
+					Plateau.context.fillStyle = '#05EFFF';
+					Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+					Plateau.context.drawImage(mine,element.left, element.top, element.width, element.height);
+				}
+				else{
+					if (element.etat === 'marque'){
+						Plateau.context.fillStyle = '#FF0000';
+						Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+					}
+					else {
+						
+						Plateau.context.fillStyle = '#05EFFF';
+						Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+					}
 			}
-			else {
-				Plateau.context.fillStyle = '#05EFFF';
-				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-			}
-
 		}
 
 	}
@@ -202,6 +305,9 @@ ws.onmessage = function(message){
 		}
 		if(objectJson.hasOwnProperty("tir")){
 			document.getElementById("chatlog").textContent += objectJson.tir + "\n"
+		}
+		if(objectJson.hasOwnProperty("bateau")){
+			document.getElementById("chatlog").textContent += objectJson.bateau.type + "\n"
 		}
 	}catch(exection){
 		document.getElementById("consolLog").textContent += message.data + "\n";

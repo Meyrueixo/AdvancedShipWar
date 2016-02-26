@@ -55,6 +55,11 @@ public class Joueur implements I_Joueur{
 					
 					this.send(message.toString());
 				}
+				if( message.has("bateau") ){
+					monjeu.broadcast(message.toString(),false);
+					
+					this.send(message.toString());
+				}
 				if( message.has("tir") ){
 					monjeu.broadcast(message.toString(),false);
 
