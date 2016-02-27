@@ -103,6 +103,7 @@ public class ControleurDeConnexion {
 		}
 		return null;
 	}
+	
 	public synchronized String existeJoueur(String idJoueur){
 		Jeu instanceJeu = null;
 		boolean trouver = false;

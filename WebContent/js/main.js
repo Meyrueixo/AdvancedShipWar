@@ -10,6 +10,26 @@ var boutonTirerMissile = document.getElementById('boutonTirerMissile');
 var boutonDirection = document.getElementById('direction');
 var etatJeu = document.getElementById('etatJeu');
 var boutonPoseBateau = document.getElementById('PoseBateau');
+
+//selecteur de bateau
+/*var estPorteAvion = document.getElementById('estPorteAvion');
+var estCroiseur =  document.getElementById('estCroiseur');
+var estSousMarin = document.getElementById('estSous-marin');
+var estTorpilleur = document.getElementById('estTorpilleur');*/
+
+
+
+//Add event listener for `click` events.
+plateauAdversaire.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauAdversaire);}, false);
+plateauMaison.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauMaison);}, false);
+boutonMarquer.addEventListener('click',marquerCase,false);
+boutonPoserMine.addEventListener('click',poserMine,false);
+boutonTirerMissile.addEventListener('click',tirerMissile,false);
+boutonDirection.addEventListener('click',changeDirection,false);
+//boutonPoseBateau.addEventListener('click',"poserBateau(this.form.typeBateau)",false);
+
+
+
 var intervalID;
 
 var mine =  new Image();
@@ -106,14 +126,6 @@ function creationPlateau(idPlateau){
 }
 
 
-//Add event listener for `click` events.
-plateauAdversaire.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauAdversaire);}, false);
-plateauMaison.zone.addEventListener('click', function(event){eventSurPlateau(event,plateauMaison);}, false);
-boutonMarquer.addEventListener('click',marquerCase,false);
-boutonPoserMine.addEventListener('click',poserMine,false);
-boutonTirerMissile.addEventListener('click',tirerMissile,false);
-boutonDirection.addEventListener('click',changeDirection,false);
-boutonPoseBateau.addEventListener('click',poserBateau,false);
 
 function changeDirection(){
 	if(boutonDirection.textContent === 'N'){
@@ -173,13 +185,19 @@ function selectCase(element){
 render(plateauAdversaire);
 render(plateauMaison);
 
-function poserBateau(event){
+function poserBateau(radio){
 	if(caseTemp.type === 'bateau')
 	{
 		alert("Un bateau est déjà posée ici");
 	}else{
+		var type;
+		for (var i=0; i<radio.length;i++) {
+	         if (radio[i].checked) {
+	            type = radio[i].value;
+	         }
+	      }
 		var bateau = {pos : caseTemp.name,
-					type:'porteavion',
+					type:type,
 					oriantation:boutonDirection.textContent
 					};
 		caseTemp.select = 'non';
@@ -224,6 +242,63 @@ function marquerCase(event){
 	}
 }
 function renduBateau(bateau){
+	var taille = 2;
+	if(bateau.type =="Porte-avion"){
+		taille = 5;
+	}else if(bateau.type == "croiseur"){
+			taille = 4;
+		}else if(bateau.type =="sous-marin"){
+			taille = 3;
+		}else{}
+	
+	var baseElement = plateauMaison.elements[bateau.pos]
+	
+	var boxBateau;
+	if(bateau.oriantation=='O'){
+		
+		boxBateau= {x:(baseElement.left-(baseElement.width*(taille-1))),
+				y:baseElement.top,
+				h:baseElement.height,
+				w:baseElement.width*taille}; 
+		
+	}else if(bateau.oriantation=='E'){
+		boxBateau= {x:baseElement.left,
+				y:baseElement.top,
+				h:baseElement.height,
+				w:baseElement.width*taille}; 
+		
+	}else if(bateau.oriantation=='S'){
+		boxBateau= {x:baseElement.left,
+				y:baseElement.top,
+				h:baseElement.height*taille,
+				w:baseElement.width}; 
+		
+	}else{
+		boxBateau= {x:baseElement.left,
+				y:(baseElement.top-(baseElement.height*(taille-1))),
+				h:(baseElement.height*taille),
+				w:baseElement.width}; 
+	}
+	
+	
+	plateauMaison.elements.forEach(function(element) {
+	
+		if((element.left >= boxBateau.x + boxBateau.w)      // trop à droite
+				|| (element.left + element.width <= boxBateau.x) // trop à gauche
+				|| (element.top >= boxBateau.y + boxBateau.h) // trop en bas
+				|| (element.top + element.height <= boxBateau.y)) {// trop en haut
+			
+			
+		
+		} else{
+			element.type ='bateau';
+		
+		}
+		
+	});
+	
+	
+		          
 	
 }
 
@@ -307,10 +382,11 @@ ws.onmessage = function(message){
 			document.getElementById("chatlog").textContent += objectJson.tir + "\n"
 		}
 		if(objectJson.hasOwnProperty("bateau")){
+			renduBateau(objectJson.bateau);
 			document.getElementById("chatlog").textContent += objectJson.bateau.type + "\n"
 		}
 	}catch(exection){
-		document.getElementById("consolLog").textContent += message.data + "\n";
+		document.getElementById("consolLog").textContent += message.data + "\n"+exection;
 	}
 	
 };
