@@ -1,22 +1,22 @@
-package game;
+package controleurJeu;
 
 import java.io.IOException;
 
 import org.json.JSONObject;
 
-public class Spectateur implements I_Participant{
+public class ControleurSpectateur implements I_ControleurParticipant{
 
     private String TokenPlayer;
     private boolean estJoueur;
-    public Jeu monjeu;
+    public ControleurJeu monjeu;
     private ClientWebSocket socket;
 	
 	
-	public Spectateur(Jeu instanceJeu) {
+	public ControleurSpectateur(ControleurJeu instanceJeu) {
 		this.monjeu = instanceJeu;
 	}
 
-	public Spectateur(Jeu instanceJeu, ClientWebSocket client) {
+	public ControleurSpectateur(ControleurJeu instanceJeu, ClientWebSocket client) {
 		this.monjeu = instanceJeu;
 		this.socket = client;
 		
@@ -53,7 +53,7 @@ public class Spectateur implements I_Participant{
 	}
 
 	@Override
-	public Jeu getjeu() {
+	public ControleurJeu getjeu() {
 		// TODO Auto-generated method stub
 		return monjeu;
 	}
@@ -65,7 +65,7 @@ public class Spectateur implements I_Participant{
 	}
 
 	@Override
-	public void setJeu(Jeu jeu) {
+	public void setJeu(ControleurJeu jeu) {
 		this.monjeu = jeu;
 		
 	}

@@ -385,6 +385,10 @@ ws.onmessage = function(message){
 			renduBateau(objectJson.bateau);
 			document.getElementById("chatlog").textContent += objectJson.bateau.type + "\n"
 		}
+		if(objectJson.hasOwnProperty("erreur")){
+			alert(objectJson.erreur );
+			document.getElementById("chatlog").textContent += objectJson.erreur + "\n"
+		}
 	}catch(exection){
 		document.getElementById("consolLog").textContent += message.data + "\n"+exection;
 	}

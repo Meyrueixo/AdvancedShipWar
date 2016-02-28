@@ -1,4 +1,4 @@
-package game;
+package controleurJeu;
 
 import java.io.IOException;
 import java.util.Set;
@@ -7,30 +7,30 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONObject;
 
-public class Jeu {
+public class ControleurJeu {
 	public String token;
 	public String nomDeLaPartie;
 	private int nbJoueur;
 	private int nbJoueurEnCour;
 	private String idJoueur1;
 	private String idJoueur2;
-	private I_Joueur Joueur1;
-	private I_Joueur Joueur2;
+	private I_ControleurJoueur Joueur1;
+	private I_ControleurJoueur Joueur2;
 	public boolean enVie = true;// plusieur etat 1 = en vie , 0 en at
 	private boolean spectateurAutorise;
     private  AtomicInteger connectionIds = new AtomicInteger(1);
-    private  Set<I_Participant> connections = new CopyOnWriteArraySet<>();
+    private  Set<I_ControleurParticipant> connections = new CopyOnWriteArraySet<>();
 	
-	public Jeu() {
+	public ControleurJeu() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Jeu(String token2, String nomParti) {
+	public ControleurJeu(String token2, String nomParti) {
 		this.token = token2;
 		this.nomDeLaPartie = nomParti;
 	}
 	
-	public Jeu(String token, String nomParti, String idJoueur1){
+	public ControleurJeu(String token, String nomParti, String idJoueur1){
 		this.token = token;
 		this.nomDeLaPartie = nomParti;
 		this.idJoueur1 = idJoueur1;
@@ -56,17 +56,17 @@ public class Jeu {
 		this.idJoueur2 = id;
 	}
 
-	public Set<I_Participant> getListeConnections() {
+	public Set<I_ControleurParticipant> getListeConnections() {
 		return connections;
 	}
 
-	private void setListeConnections(Set<I_Participant> connections) {
+	private void setListeConnections(Set<I_ControleurParticipant> connections) {
 		this.connections = connections;
 	}
 	
 	public void finDePartie(){
 		broadcast("{\"info\":\"Partie Terminer\"}",true);
-		 for (I_Participant client : connections) {
+		 for (I_ControleurParticipant client : connections) {
 			 try {
 				client.close();
 			} catch (IOException e) {
@@ -79,10 +79,10 @@ public class Jeu {
 	}
 	
 	public void broadcast(String msg ,  boolean tous) {
-	        for (I_Participant client : connections) {
+	        for (I_ControleurParticipant client : connections) {
 	            try {
 	                synchronized (client) {
-	                	if(!client.getClass().equals(Joueur.class) || tous){
+	                	if(!client.getClass().equals(ControleurJoueur.class) || tous){
 	                		client.send( msg);
 	                	}
 	                	
@@ -103,23 +103,31 @@ public class Jeu {
 	        }
 	    }
 
-	public I_Joueur getJoueur1() {
+	public I_ControleurJoueur getJoueur1() {
 		return Joueur1;
 	}
+	public I_ControleurJoueur adversaire(I_ControleurJoueur joueur){
+		if(Joueur1 != joueur){
+			return Joueur1;
+		}else{
+			return Joueur2;
+		}
+		
+	}
 
-	public void setJoueur1(I_Joueur joueur1) {
+	public void setJoueur1(I_ControleurJoueur joueur1) {
 		Joueur1 = joueur1;
 	}
 
-	public I_Joueur getJoueur2() {
+	public I_ControleurJoueur getJoueur2() {
 		return Joueur2;
 	}
 
-	public void setJoueur2(I_Joueur joueur2) {
+	public void setJoueur2(I_ControleurJoueur joueur2) {
 		Joueur2 = joueur2;
 	}
 	
-	public void ajoutParticipant(I_Participant part){
+	public void ajoutParticipant(I_ControleurParticipant part){
 		this.connections.add(part);
 		
 		JSONObject json = new JSONObject();

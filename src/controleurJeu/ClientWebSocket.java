@@ -1,4 +1,4 @@
-package game;
+package controleurJeu;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -21,7 +21,7 @@ public class ClientWebSocket {
     private Session session;
 
     private ControleurDeConnexion controleCon =  ControleurDeConnexion.GETINSTANCE();
-    private I_Participant participant;
+    private I_ControleurParticipant participant;
     
     public ClientWebSocket() {
         nickname = GUEST_PREFIX;

@@ -1,4 +1,4 @@
-package game;
+package controleurJeu;
 
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import bean.InfoJeuBean;
 public class ControleurDeConnexion {
 	
 	
-	protected List<Jeu> listeJeu;
+	protected List<ControleurJeu> listeJeu;
 	Timer timer = new Timer();
 	 ActionClear action ;
 	
@@ -29,7 +29,7 @@ public class ControleurDeConnexion {
 	public synchronized String creationPartie(String Token , String nomParti, String idJoueur1){
 		String idPartie = existeJoueur(idJoueur1);
 		if(idPartie == null){
-			Jeu monJeu =new Jeu(Token,nomParti, idJoueur1);
+			ControleurJeu monJeu =new ControleurJeu(Token,nomParti, idJoueur1);
 			listeJeu.add(monJeu);
 			return monJeu.token;
 		}else{
@@ -38,8 +38,8 @@ public class ControleurDeConnexion {
 
 	}
 	
-	public synchronized I_Participant connexion(String idJeu,String idJoueur, ClientWebSocket client){
-		Jeu instanceJeu = recherche(idJeu);
+	public synchronized I_ControleurParticipant connexion(String idJeu,String idJoueur, ClientWebSocket client){
+		ControleurJeu instanceJeu = recherche(idJeu);
 		
 		if(instanceJeu == null){
 			try {
@@ -52,18 +52,18 @@ public class ControleurDeConnexion {
 			}
 			return null;
 		}else{
-			I_Participant participant ;
+			I_ControleurParticipant participant ;
 			if(instanceJeu.getIdJoueur1().equals(idJoueur)){
 			//TODO factory
-				participant = new Joueur(instanceJeu,client);
-				instanceJeu.setJoueur1(((I_Joueur)participant));
+				participant = new ControleurJoueur(instanceJeu,client);
+				instanceJeu.setJoueur1(((I_ControleurJoueur)participant));
 				
 			}else if(instanceJeu.getIdJoueur2() != null && instanceJeu.getIdJoueur2().equals(idJoueur)){
 				//TODO factory
-				participant = new Joueur(instanceJeu,client);
-				instanceJeu.setJoueur2((I_Joueur) participant);
+				participant = new ControleurJoueur(instanceJeu,client);
+				instanceJeu.setJoueur2((I_ControleurJoueur) participant);
 			}else{
-				participant = new Spectateur(instanceJeu,client);
+				participant = new ControleurSpectateur(instanceJeu,client);
 			}
 			instanceJeu.ajoutParticipant(participant);
 			return  participant;
@@ -72,14 +72,14 @@ public class ControleurDeConnexion {
 	}
 	public List<InfoJeuBean> listinfoJeu(){
 		List<InfoJeuBean> infos = new ArrayList<InfoJeuBean>();
-		for (Jeu jeu : listeJeu) {
+		for (ControleurJeu jeu : listeJeu) {
 			infos.add(new InfoJeuBean(jeu.token,jeu.nomDeLaPartie));
 		}
 		return infos;
 	}
 	public boolean ajoutJoueur(String idGame,String idJoueur){
 		boolean ok =  false;
-		Jeu instance = recherche(idGame);
+		ControleurJeu instance = recherche(idGame);
 		if(instance != null){
 			if(instance.getIdJoueur2() == null){
 				instance.setIdJoueur2(idJoueur);
@@ -89,13 +89,13 @@ public class ControleurDeConnexion {
 		return ok;
 	}
 	
-	public synchronized  Jeu recherche(String Token){
-		Jeu instanceJeu = null;
+	public synchronized  ControleurJeu recherche(String Token){
+		ControleurJeu instanceJeu = null;
 		boolean trouver = false;
 		Iterator it =listeJeu.iterator();
 		while (it.hasNext() && !trouver ) {
 			
-			instanceJeu = ((Jeu)it.next());
+			instanceJeu = ((ControleurJeu)it.next());
 			if(Token.equals(instanceJeu.token)){
 				trouver = true;
 				return instanceJeu;
@@ -105,13 +105,13 @@ public class ControleurDeConnexion {
 	}
 	
 	public synchronized String existeJoueur(String idJoueur){
-		Jeu instanceJeu = null;
+		ControleurJeu instanceJeu = null;
 		boolean trouver = false;
 		String idPartie = null;
 		Iterator it =listeJeu.iterator();
 		while (it.hasNext() && !trouver ) {
 			
-			instanceJeu = ((Jeu)it.next());
+			instanceJeu = ((ControleurJeu)it.next());
 			if(idJoueur.equals(instanceJeu.getIdJoueur1())){
 				trouver = true;
 				idPartie = instanceJeu.token;
@@ -122,7 +122,7 @@ public class ControleurDeConnexion {
 	
 
 	private ControleurDeConnexion() {
-		listeJeu = new ArrayList<Jeu>();
+		listeJeu = new ArrayList<ControleurJeu>();
 		action = new  ActionClear(listeJeu);
 		//execute action clear a interval regulier
 		timer.scheduleAtFixedRate(action,((long)( 1*60*1000)), ((long)( 1*60*1000)));

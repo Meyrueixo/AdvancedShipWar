@@ -1,13 +1,13 @@
-package game;
+package controleurJeu;
 
 
 import java.util.List;
 import java.util.TimerTask;
 
 public class ActionClear extends TimerTask {
-	List<Jeu> ListJeu;
+	List<ControleurJeu> ListJeu;
 	
-	public ActionClear(List<Jeu> ListJeu)
+	public ActionClear(List<ControleurJeu> ListJeu)
 	{
 		this.ListJeu = ListJeu;
 	}
@@ -18,7 +18,7 @@ public class ActionClear extends TimerTask {
 
 	}
 	public synchronized void clearListeJeu(){
-		Jeu instanceJeu = null;
+		ControleurJeu instanceJeu = null;
 		for (int i = 0; i < ListJeu.size(); i++) {
 			instanceJeu = ListJeu.get(i);
 			if(instanceJeu.enVie == false){

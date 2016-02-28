@@ -1,17 +1,17 @@
-package game;
+package controleurJeu;
 
 import java.io.IOException;
 
 import org.json.JSONObject;
 
-public interface I_Participant {
+public interface I_ControleurParticipant {
 	
 	public void end();
 	public String getNickname();
 	public void incoming(JSONObject message);
 	public void send(String message) throws IOException;
-	public Jeu getjeu();
-	public void setJeu(Jeu jeu);
+	public ControleurJeu getjeu();
+	public void setJeu(ControleurJeu jeu);
 	public void close() throws IOException;
 	void setIWebSocket(ClientWebSocket sock);
 	
