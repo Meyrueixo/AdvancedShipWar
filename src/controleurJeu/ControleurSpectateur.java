@@ -86,6 +86,23 @@ public class ControleurSpectateur implements I_ControleurParticipant{
 		}
 	}
 
+	@Override
+	public void changeEtat(EtatJeu etat) {
+		
+		JSONObject json = new JSONObject();
+		JSONObject etatjson = new JSONObject();
+		etatjson.accumulate("description",etat.getDescription());
+		etatjson.accumulate("id",etat.ordinal());
+		json.accumulate("etat",etatjson);
+		try {
+			this.send(json.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
 
 
 }

@@ -17,10 +17,21 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 	private Joueur joueur;
 	private String nomJoueur;
 	private boolean autoriseJeu = true;
+	private boolean aJouer = false;
+	private boolean porteAvionPose = false;
+	private boolean sousMarniPose = false;
+	private boolean croiseurPose = false;
+	private boolean torpilleurPose = false;
+	private boolean fini = false;
 
 	public ControleurJoueur(ControleurJeu jeu){
 		monjeu = jeu;
 	}
+	
+	public boolean toutBateauPosse(){ 
+		return porteAvionPose && sousMarniPose && croiseurPose && torpilleurPose ;
+	}
+	
 	public ControleurJoueur(ControleurJeu jeu,ClientWebSocket socket){
 		monjeu = jeu;
 		this.socket = socket;
@@ -39,6 +50,20 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 				getNickname(), "has disconnected.");
 		monjeu.broadcast(message,true);
 
+	}
+	public void changeEtat(EtatJeu etat){
+	
+			JSONObject json = new JSONObject();
+			JSONObject etatjson = new JSONObject();
+			etatjson.accumulate("description",etat.getDescription());
+			etatjson.accumulate("id",etat.ordinal());
+			json.accumulate("etat",etatjson);
+			try {
+				this.send(json.toString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 	
 	public void setNickname(String nomJoueur) {
@@ -69,6 +94,16 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 				}
 				if(monjeu.adversaire(this) != null){
 					
+					if( message.has("fin") ){
+						if(autoriseJeu && !aJouer && !toutBateauPosse()){
+							monjeu.finDePartie("\n" +this.getNickname() + " n'a pas jouer dans les temps \n"+monjeu.adversaire(this).getNickname() + " gagne !!" );
+						}else{
+							fini = true;
+							monjeu.finDeTour(this);
+							
+						}
+					}
+					aJouer = true;
 					Joueur advaisaire =((ControleurJoueur) monjeu.adversaire(this)).getJoueur();	
 					if( message.has("mine") ){
 						
@@ -86,13 +121,16 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 							String orientation =  message.getJSONObject("bateauPlacement").getString("orientation");
 							if(bateau.equals("PorteAvion")){
 								ok = joueur.placerPorteAvion(pos, OrientationFactory.create(orientation));
+								porteAvionPose = true;
 							}else if(bateau.equals("Croiseur")){
 								ok = joueur.placerCroiseur(pos, OrientationFactory.create(orientation));
-							
+								croiseurPose = true;
 							}else if(bateau.equals("SousMarin")){
 								ok = joueur.placerSousMarin(pos, OrientationFactory.create(orientation));
+								 sousMarniPose = true;
 							}else if(bateau.equals("Torpilleur")){
 								ok = joueur.placerTorpilleur(pos, OrientationFactory.create(orientation));
+								torpilleurPose = true;
 							}
 							
 							if(ok){
@@ -254,6 +292,39 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 			e.printStackTrace();
 		}
 		
+	}
+
+	@Override
+	public boolean getAutorisationJeu() {
+		// TODO Auto-generated method stub
+		return this.autoriseJeu;
+	}
+
+	@Override
+	public void setAutorisationJeu(boolean autorise) {
+		this.autoriseJeu = autorise;
+		
+	}
+
+	@Override
+	public void nouveautour() {
+		this.autoriseJeu = true;
+		this.aJouer = false;
+		this.fini = false;
+		JSONObject json = new JSONObject();
+		json.accumulate("go",1);
+		try {
+			this.send(json.toString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public boolean aFini() {
+		
+		return this.fini;
 	}
 
 

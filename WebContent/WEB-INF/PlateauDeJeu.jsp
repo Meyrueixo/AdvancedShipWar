@@ -39,7 +39,7 @@
 				<div class="row grid">
 					
 					<div class="col-md-2">
-						<p id="etatJeu">Temps restent : </p>
+						<p id="TimerJeu">Temps restent : </p>
 						<p id="poinAction">Points d'action :  3</p>
 					</div>
 					<form>
@@ -53,9 +53,13 @@
 						</div>
 						<div class="col-md-2">
 							<button type="button" class="btn btn-default" aria-label="Left Align" id="direction" >N</button>
-							<input type="button" id="PoseBateau" value="Placer bateau" onClick="poserBateau(this.form.typeBateau)">Placer bateau</button>
+							<input type="button" id="PoseBateau" value="Placer bateau" onClick="poserBateau(this.form.typeBateau)"></button>
 						</div>
 					</form>
+					<div class="col-md-2">
+						<p id="etatJeu">En Attente d'adversaire </p>
+						<p id="tours"> </p>
+					</div>
 				</div>
 				<div class="row grid">
 					<div class="col-md-6">

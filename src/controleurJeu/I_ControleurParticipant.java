@@ -14,6 +14,6 @@ public interface I_ControleurParticipant {
 	public void setJeu(ControleurJeu jeu);
 	public void close() throws IOException;
 	void setIWebSocket(ClientWebSocket sock);
-	
+	public void changeEtat(EtatJeu etat);
 
 }

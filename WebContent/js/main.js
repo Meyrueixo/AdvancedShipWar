@@ -8,9 +8,11 @@ var boutonMarquer = document.getElementById('boutonMarquer');
 var boutonPoserMine = document.getElementById('boutonPoserMine');
 var boutonTirerMissile = document.getElementById('boutonTirerMissile');
 var boutonDirection = document.getElementById('direction');
-var etatJeu = document.getElementById('etatJeu');
+var timerJeu = document.getElementById('TimerJeu');
 var boutonPoseBateau = document.getElementById('PoseBateau');
 var poinAction = document.getElementById('poinAction');
+var EtatJeu = document.getElementById('etatJeu');
+var monTour = document.getElementById('tours');
 
 //selecteur de bateau
 /*var estPorteAvion = document.getElementById('estPorteAvion');
@@ -36,20 +38,20 @@ var intervalID;
 var mine =  new Image();
 mine.src ='assets/mine.png';
 var caseTemp =null;
-
+var dureeCoup;
 
 
 function preparation(){
+	dureeCoup= 60;
 	intervalID = setInterval(Timer,999);
-	var dureeCoup= 120;
-
-
 }
+
 
 function stopTimer() {
 	clearInterval(intervalID);
-	etatJeu.innerHTML="terminé";
-	//finDeTour();
+	timerJeu.textContent="terminé";
+	finDeTour();
+	monTour.textContent = "Au tour de l'adversaire"
 }
 function Timer()
 {
@@ -75,7 +77,7 @@ function Timer()
 		if(m<10){
 			m="0"+m
 		}
-		etatJeu.innerHTML="Temps restent : "+m+":"+s;
+		timerJeu.innerHTML="Temps restent : "+m+":"+s;
 	}
 	dureeCoup=dureeCoup-1;
 
@@ -84,8 +86,13 @@ function Timer()
 function finDeTour(){
 	boutonPoserMine.disabled = true;
 	boutonTirerMissile.disabled =true;
+	sendJson("fin", 1);
 }
+
 function debutDeTour(){
+	monTour.textContent = "C'est a vous."
+	dureeCoup= 120;
+	intervalID.setInterval(Timer,999);
 	boutonPoserMine.disabled = false;
 	boutonTirerMissile.disabled = false;
 }
@@ -426,6 +433,18 @@ ws.onmessage = function(message){
 		}
 		if(objectJson.hasOwnProperty("pointAction")){
 			poinAction.textContent = "Points d'action : " + objectJson.pointAction;
+		
+		}
+		if(objectJson.hasOwnProperty("go")){
+			clearInterval(intervalID);
+			debutDeTour();
+		}
+		if(objectJson.hasOwnProperty("etat")){
+			EtatJeu.textContent =  objectJson.etat.description;
+			if(objectJson.etat.id == 1){
+				clearInterval(intervalID);
+				preparation();
+			}
 		
 		}
 	}catch(exection){
