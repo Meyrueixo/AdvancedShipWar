@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.json.JSONObject;
 
 import jeu.Joueur;
+import orientation.OrientationFactory;
 import orientation.OrientationNORTH;
 
 public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
@@ -55,7 +56,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 		
 		
 		if(monjeu != null){
-			
+			boolean ok = true;
 			try {	
 				if( message.has("chat") ){
 					traitementChat( message);
@@ -64,30 +65,61 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 					
 					Joueur advaisaire =((ControleurJoueur) monjeu.adversaire(this)).getJoueur();	
 					if( message.has("mine") ){
+						this.send(message.toString());
+						joueur.placerMine(message.getJSONObject("mine").getInt("pos"));
 						monjeu.broadcast(message.toString(),false);
 						
-						this.send(message.toString());
 					}
 					if( message.has("bateauPlacement") ){
 						String bateau =  message.getJSONObject("bateauPlacement").getString("type");
 						int pos = message.getJSONObject("bateauPlacement").getInt("pos");
+						String orientation =  message.getJSONObject("bateauPlacement").getString("orientation");
 						if(bateau.equals("PorteAvion")){
-							
+							ok = joueur.placerPorteAvion(pos, OrientationFactory.create(orientation));
 						}else if(bateau.equals("Croiseur")){
-							
+							ok = joueur.placerCroiseur(pos, OrientationFactory.create(orientation));
 						
 						}else if(bateau.equals("SousMarin")){
-							
-						}else if(bateau.equals("Torpiller")){
-							
+							ok = joueur.placerSousMarin(pos, OrientationFactory.create(orientation));
+						}else if(bateau.equals("Torpilleur")){
+							ok = joueur.placerTorpilleur(pos, OrientationFactory.create(orientation));
 						}
-						monjeu.broadcast(message.toString(),false);
 						
-						this.send(message.toString());
+						if(ok){
+							JSONObject json = new JSONObject();
+							json.accumulate("bateau",message.getJSONObject("bateauPlacement"));
+							this.send(json.toString());
+							monjeu.broadcast(json.toString(),false);
+						}else{
+							erreur("placement inposible");
+						}
+						
+						
 					}
 					if( message.has("bateau") ){
 						monjeu.broadcast(message.toString(),false);
 						
+						String bateau =  message.getJSONObject("bateau").getString("type");
+						int pos = message.getJSONObject("bateau").getInt("pos");
+						String orientation =  message.getJSONObject("bateau").getString("orientation");
+						if(bateau.equals("PorteAvion")){
+							ok = joueur.deplacerPorteAvion(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+						}else if(bateau.equals("Croiseur")){
+							ok = joueur.deplacerCroiseur(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+						
+						}else if(bateau.equals("SousMarin")){
+							ok = joueur.deplacerSousMarin(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+						}else if(bateau.equals("Torpilleur")){
+							ok = joueur.deplacerTorpilleur(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+						}
+						if(ok){
+							/*JSONObject json = new JSONObject();
+							json.accumulate("bateau",message.getJSONObject("bateauPlacement"));*/
+							this.send(message.toString());
+							monjeu.broadcast(message.toString(),false);
+						}else{
+				
+						}
 						this.send(message.toString());
 					}
 					if( message.has("tir") ){

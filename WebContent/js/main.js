@@ -116,7 +116,8 @@ function creationPlateau(idPlateau){
 				type : 'vide',
 				etat : 'inactif',
 				select : 'non',
-				orientation :'vertical'
+				orientation :'vertical',
+				touche : 0
 			});
 			compt++;
 		}
@@ -198,10 +199,10 @@ function poserBateau(radio){
 	      }
 		var bateau = {pos : caseTemp.name,
 					type:type,
-					oriantation:boutonDirection.textContent
+					orientation:boutonDirection.textContent
 					};
 		caseTemp.select = 'non';
-		sendJson("bateau",  bateau);
+		sendJson("bateauPlacement",  bateau);
 	}
 }
 
@@ -254,20 +255,20 @@ function renduBateau(bateau){
 	var baseElement = plateauMaison.elements[bateau.pos]
 	
 	var boxBateau;
-	if(bateau.oriantation=='O'){
+	if(bateau.orientation=='O'){
 		
 		boxBateau= {x:(baseElement.left-(baseElement.width*(taille-1))),
 				y:baseElement.top,
 				h:baseElement.height,
 				w:baseElement.width*taille}; 
 		
-	}else if(bateau.oriantation=='E'){
+	}else if(bateau.orientation=='E'){
 		boxBateau= {x:baseElement.left,
 				y:baseElement.top,
 				h:baseElement.height,
 				w:baseElement.width*taille}; 
 		
-	}else if(bateau.oriantation=='S'){
+	}else if(bateau.orientation=='S'){
 		boxBateau= {x:baseElement.left,
 				y:baseElement.top,
 				h:baseElement.height*taille,
@@ -315,26 +316,52 @@ function renderBis(element, Plateau){
 				Plateau.context.fillRect(element.left, element.top, element.width-10, element.height);
 				
 			}else{
+				
 				if(element.type == 'mine')
 				{
-					Plateau.context.fillStyle = '#05EFFF';
+					if (element.etat === 'marque'){
+						Plateau.context.fillStyle = '#FF0000';
+					}else{
+						Plateau.context.fillStyle = '#05EFFF';
+					}
 					Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 					Plateau.context.drawImage(mine,element.left, element.top, element.width, element.height);
 				}
-				else{
+				
+				if (element.type === 'tri'){
+				
 					if (element.etat === 'marque'){
 						Plateau.context.fillStyle = '#FF0000';
-						Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-					}
-					else {
-						
+					}else{
 						Plateau.context.fillStyle = '#05EFFF';
-						Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 					}
+					Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+					
+					if(touche  == 1){
+						//toucher
+						Plateau.context.fillStyle = '#FF0000';
+					}else if(touche == 2){
+						//rater
+						Plateau.context.fillStyle = '#000000';
+					}
+					Plateau.context.moveTo(element.left, element.top);
+					Plateau.context.lineTo(element.width, element.height);
+					Plateau.context.stroke();
+					
+				
+				
+				}else{
+					if (element.etat === 'marque'){
+						Plateau.context.fillStyle = '#FF0000';
+					}else{
+						Plateau.context.fillStyle = '#05EFFF';
+					}
+					Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+				}
 			}
 		}
 
-	}
+	
 
 	Plateau.context.strokeStyle = '#000000';
 

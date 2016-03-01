@@ -8,13 +8,17 @@
         <title>Test</title>
     </head>
     <body>
-        <p>Info du client :</p>
-        <p>
-            <% String IdSession = (String) request.getAttribute("IdSession");
-            	out.print("Id Session :");
-	            out.println( IdSession );
-            %>
-        </p>
+     <div id="debug">
+        	<p>Info du client :</p>
+       
+	        <p>
+	            <% String IdSession = (String) request.getAttribute("IdSession");
+	            	out.print("Id Session :");
+		            out.println( IdSession );
+	            %>
+	        </p>
+        </div>
+        
         <p> Liste des Parties</p>
        	<form action="" method="post">
 		  <% java.util.List<InfoJeuBean> listeInfoPartie = (java.util.ArrayList) request.getAttribute("ListPartie");
@@ -29,7 +33,7 @@
             %>
            	 	<input type="radio" name="Jouer" value="true">Jouer
            	 	<input type="radio" name="Jouer" value="false">Regarder
-			  <input type="submit" value="Submit">
+			  <input type="submit" value="Entrer">
 		</form>
 		<p> Crée une partie</p>
 		<form action="" method="post">
@@ -37,7 +41,7 @@
 			  <input type="text" name="nomPartie">
 			  <br>
 			  	<input type="hidden" name="Create" value="true" >
-			   <input type="submit" value="Submit">
+			   <input type="submit" value="Créer une partie">
 		</form>
     </body>
 </html>

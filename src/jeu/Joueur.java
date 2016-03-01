@@ -21,7 +21,7 @@ public class Joueur  {
 	private Torpilleur torpilleur;
 	private int pointDAction = 3;
 	private List<Mine> listeDeMine;
-	private I_ObservateurJoueur Observateur;
+	private I_ObservateurJoueur ObservateurJoueur;
 	private int[] plateau;
 	
 	/******************* Methods ***********************************/
@@ -47,6 +47,29 @@ public class Joueur  {
 		this.torpilleur.placerBateau(posT);
 	}
 	
+	public boolean placerPorteAvion(int pos,I_Orientation orientation){
+		this.porteAvion.setOrientation(orientation);
+		return this.porteAvion.placerBateau(pos);
+		
+	}
+	
+	public boolean placerCroiseur(int pos , I_Orientation orientation){
+	
+		this.croiseur.setOrientation(orientation);
+		return this.croiseur.placerBateau(pos);
+	}
+	
+	public boolean placerSousMarin(int pos, I_Orientation orientation){
+		
+		this.sousMarin.setOrientation(orientation);
+		return this.sousMarin.placerBateau(pos);
+	}
+	
+	public boolean placerTorpilleur(int pos , I_Orientation orientation){
+		this.torpilleur.setOrientation(orientation);
+		return this.torpilleur.placerBateau(pos);
+	}
+	
 	public boolean tireUnMissile(int tir,Joueur adversaire){
 		perdsUnPointDAction();
 		if(adversaire.bateauTouche(tir)){
@@ -57,27 +80,27 @@ public class Joueur  {
 			return false;
 		}
 	}
-
+//appel par l'adv
 	public boolean bateauTouche(int pos) {
 		boolean pATouche = estPresent(pos,this.porteAvion.caseOccupeParLeBateau());
 		if(pATouche){
 			this.porteAvion.perdsUnPointDeVie();
-			Observateur.touche(pos, PorteAvion.class.getName());
+			ObservateurJoueur.touche(pos, PorteAvion.class.getName());
 		}
 		boolean cTouche = estPresent(pos,this.croiseur.caseOccupeParLeBateau());
 		if(cTouche){
 			this.croiseur.perdsUnPointDeVie();
-			Observateur.touche(pos, Croiseur.class.getName());
+			ObservateurJoueur.touche(pos, Croiseur.class.getName());
 		}
 		boolean sMTouche = estPresent(pos,this.sousMarin.caseOccupeParLeBateau());
 		if(sMTouche){
 			this.sousMarin.perdsUnPointDeVie();
-			Observateur.touche(pos, SousMarin.class.getName());
+			ObservateurJoueur.touche(pos, SousMarin.class.getName());
 		}
 		boolean tTouche = estPresent(pos,this.torpilleur.caseOccupeParLeBateau());
 		if(tTouche){
 			this.torpilleur.perdsUnPointDeVie();
-			Observateur.touche(pos, Torpilleur.class.getName());
+			ObservateurJoueur.touche(pos, Torpilleur.class.getName());
 		}
 		return (pATouche || cTouche || sMTouche || tTouche);
 	}
@@ -106,43 +129,51 @@ public class Joueur  {
 	
 	public void perdsUnPointDAction(){
 		this.pointDAction --;
-		Observateur.modifPointAction(this.pointDAction);
+		ObservateurJoueur.modifPointAction(this.pointDAction);
 	}
 	
 	public void resetPointsDAction(){
 		this.pointDAction = 3;
-		Observateur.modifPointAction(this.pointDAction);
+		ObservateurJoueur.modifPointAction(this.pointDAction);
 	}
-	
-	public void deplacerPorteAvion(int pos, I_Orientation rotation,List<Mine> listeMine){
+	//liste mine adversair
+	public boolean deplacerPorteAvion(int pos, I_Orientation rotation,List<Mine> listeMine){
 		if (this.porteAvion.deplacerBateau(pos, rotation, listeMine)){
 			perdsUnPointDAction();
+			return true;
 		} else {
-			Observateur.erreur("Deplacement impossible");
+			//ObservateurJoueur.erreur("Deplacement impossible");
+			return false;
 		}
 	}
 	
-	public void deplacerCroiseur(int pos, I_Orientation rotation,List<Mine> listeMine){
+	public boolean deplacerCroiseur(int pos, I_Orientation rotation,List<Mine> listeMine){
 		if (this.croiseur.deplacerBateau(pos, rotation, listeMine)){
 			perdsUnPointDAction();
+			return true;
 		} else {
-			Observateur.erreur("Deplacement impossible");
+			//ObservateurJoueur.erreur("Deplacement impossible");
+			return false;
 		}
 	}
 	
-	public void deplacerSousMarin(int pos, I_Orientation rotation,List<Mine> listeMine){
+	public boolean deplacerSousMarin(int pos, I_Orientation rotation,List<Mine> listeMine){
 		if (this.sousMarin.deplacerBateau(pos, rotation, listeMine)){
 			perdsUnPointDAction();
+			return true;
 		} else {
-			Observateur.erreur("Deplacement impossible");
+			//ObservateurJoueur.erreur("Deplacement impossible");
+			return false;
 		}
 	}
 	
-	public void deplacerTorpilleur(int pos, I_Orientation rotation,List<Mine> listeMine){
+	public boolean deplacerTorpilleur(int pos, I_Orientation rotation,List<Mine> listeMine){
 		if (this.torpilleur.deplacerBateau(pos, rotation, listeMine)){
 			perdsUnPointDAction();
+			return true;
 		} else {
-			Observateur.erreur("Deplacement impossible");
+			//ObservateurJoueur.erreur("Deplacement impossible");
+			return false;
 		}
 	}
 	
