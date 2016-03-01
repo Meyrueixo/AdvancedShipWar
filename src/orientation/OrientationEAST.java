@@ -65,5 +65,8 @@ public class OrientationEAST implements I_Orientation{
 		}
 		return minePresente;
 	}
+	public String toString(){
+		return "E";
+	}
 
 }

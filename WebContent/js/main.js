@@ -13,6 +13,7 @@ var boutonPoseBateau = document.getElementById('PoseBateau');
 var poinAction = document.getElementById('poinAction');
 var EtatJeu = document.getElementById('etatJeu');
 var monTour = document.getElementById('tours');
+var boutonDeplaceBateau = document.getElementById('DeplaceBateau');
 
 //selecteur de bateau
 /*var estPorteAvion = document.getElementById('estPorteAvion');
@@ -29,7 +30,7 @@ boutonMarquer.addEventListener('click',marquerCase,false);
 boutonPoserMine.addEventListener('click',poserMine,false);
 boutonTirerMissile.addEventListener('click',tirerMissile,false);
 boutonDirection.addEventListener('click',changeDirection,false);
-//boutonPoseBateau.addEventListener('click',"poserBateau(this.form.typeBateau)",false);
+boutonDeplaceBateau.addEventListener('click',deplaceBateau,false);
 
 
 
@@ -40,6 +41,26 @@ mine.src ='assets/mine.png';
 var caseTemp =null;
 var dureeCoup;
 
+function deplaceBateau(){
+	var radio = document.forms[0].typeBateau;
+	if(caseTemp.type === 'bateau')
+	{
+		alert("Un bateau est déjà posée ici");
+	}else{
+		var type;
+		for (var i=0; i<radio.length;i++) {
+			if (radio[i].checked) {
+				type = radio[i].value;
+			}
+		}
+		var bateau = {pos : caseTemp.name,
+				type:type,
+				orientation:boutonDirection.textContent
+		};
+		caseTemp.select = 'non';
+		sendJson("bateau",  bateau);
+	}
+}
 
 function preparation(){
 	dureeCoup= 60;
@@ -86,15 +107,17 @@ function Timer()
 function finDeTour(){
 	boutonPoserMine.disabled = true;
 	boutonTirerMissile.disabled =true;
+	boutonDeplaceBateau.disabled =true;
 	sendJson("fin", 1);
 }
 
 function debutDeTour(){
 	monTour.textContent = "C'est a vous."
 	dureeCoup= 120;
-	intervalID.setInterval(Timer,999);
+	intervalID = setInterval(Timer,999);
 	boutonPoserMine.disabled = false;
 	boutonTirerMissile.disabled = false;
+	boutonDeplaceBateau.disabled =false;
 }
 
 function creationPlateau(idPlateau){
@@ -126,7 +149,8 @@ function creationPlateau(idPlateau){
 				etat : 'inactif',
 				select : 'non',
 				orientation :'vertical',
-				touche : 0
+				touche : 0,
+				vie : 1
 			});
 			compt++;
 		}
@@ -290,7 +314,8 @@ function renduBateau(bateau,plateau){
 				w:baseElement.width}; 
 	}
 
-
+	var conpt = 0;
+	
 	plateau.elements.forEach(function(element) {
 
 		if((element.left >= boxBateau.x + boxBateau.w)      // trop à droite
@@ -300,11 +325,23 @@ function renduBateau(bateau,plateau){
 
 			if(element.option== bateau.type){
 				element.type = 'vide';
+				element.vie = 1;
+				element.orientation  = 'vertical';
+				element.option = 'vide';
 			}
 
 		} else{
+			element.vie = 1;
 			element.type ='bateau';
+			
 			element.option = bateau.type;
+			if(bateau.orientation=='E'  || (bateau.orientation=='O')){
+				element.orientation = 'Horizontal';
+			}
+			if(conpt < bateau.vie){
+				conpt++;
+				element.vie = 0;
+			}
 
 		}
 
@@ -330,10 +367,19 @@ function renderBis(element, Plateau){
 	}
 	else{
 		if(element.type == 'bateau'){
-			Plateau.context.fillStyle = ' #008000';
+			if(element.vie == 1){
+				Plateau.context.fillStyle = ' #FF0000';
+			}else{
+				Plateau.context.fillStyle = ' #008000';
+			}
 			Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 			Plateau.context.fillStyle = ' #808080';
-			Plateau.context.fillRect(element.left, element.top, element.width-10, element.height);
+			if(element.orientation == 'Horizontal'){
+				Plateau.context.fillRect(element.left, element.top, element.width, element.height-10);
+			}else{
+				Plateau.context.fillRect(element.left, element.top, element.width-10, element.height);
+			}
+			
 
 		}else{
 			renduMarque(Plateau,element);
@@ -420,12 +466,13 @@ ws.onmessage = function(message){
 			render(plateau);
 		}
 		if(objectJson.hasOwnProperty("tir")){
-			document.getElementById("chatlog").textContent += objectJson.tir + "\n"
+			
 			plateau.elements[objectJson.tir.pos].touche = objectJson.tir.resultat;
+			render(plateau);
 		}
 		if(objectJson.hasOwnProperty("bateau")){
 			renduBateau(objectJson.bateau,plateau);
-			document.getElementById("chatlog").textContent += objectJson.bateau.type + "\n"
+			//document.getElementById("chatlog").textContent += objectJson.bateau.type + "\n"
 		}
 		if(objectJson.hasOwnProperty("erreur")){
 			alert(objectJson.erreur);
@@ -433,6 +480,9 @@ ws.onmessage = function(message){
 		}
 		if(objectJson.hasOwnProperty("pointAction")){
 			poinAction.textContent = "Points d'action : " + objectJson.pointAction;
+			if(objectJson.pointAction <= 0){
+				stopTimer();
+			}
 		
 		}
 		if(objectJson.hasOwnProperty("go")){
@@ -444,6 +494,9 @@ ws.onmessage = function(message){
 			if(objectJson.etat.id == 1){
 				clearInterval(intervalID);
 				preparation();
+				document.getElementById("PoseBateau").style = "";
+			}else{
+				document.getElementById("PoseBateau").style = "display:none";
 			}
 		
 		}

@@ -66,5 +66,8 @@ public class OrientationSOUTH implements I_Orientation {
 		}
 		return minePresente;
 	}
+	public String toString(){
+		return "S";
+	}
 
 }

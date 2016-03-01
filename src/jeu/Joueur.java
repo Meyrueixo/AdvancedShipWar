@@ -73,10 +73,10 @@ public class Joueur  {
 	public boolean tireUnMissile(int tir,Joueur adversaire){
 		perdsUnPointDAction();
 		if(adversaire.bateauTouche(tir)){
-			System.out.println("bateau touché !");
+			//System.out.println("bateau touché !");
 			return true;
 		} else {
-			System.out.println("plouf !");
+			//System.out.println("plouf !");
 			return false;
 		}
 	}
@@ -85,22 +85,22 @@ public class Joueur  {
 		boolean pATouche = estPresent(pos,this.porteAvion.caseOccupeParLeBateau());
 		if(pATouche){
 			this.porteAvion.perdsUnPointDeVie();
-			ObservateurJoueur.touche(pos, PorteAvion.class.getName());
+			ObservateurJoueur.touche(this.porteAvion.getPosition(), "PorteAvion",this.porteAvion.getPointDeVie(),this.porteAvion.getOrientation().toString());
 		}
 		boolean cTouche = estPresent(pos,this.croiseur.caseOccupeParLeBateau());
 		if(cTouche){
 			this.croiseur.perdsUnPointDeVie();
-			ObservateurJoueur.touche(pos, Croiseur.class.getName());
+			ObservateurJoueur.touche(this.croiseur.getPosition(), "Croiseur",this.croiseur.getPointDeVie(),this.croiseur.getOrientation().toString());
 		}
 		boolean sMTouche = estPresent(pos,this.sousMarin.caseOccupeParLeBateau());
 		if(sMTouche){
 			this.sousMarin.perdsUnPointDeVie();
-			ObservateurJoueur.touche(pos, SousMarin.class.getName());
+			ObservateurJoueur.touche(this.sousMarin.getPosition(), "SousMarin",this.sousMarin.getPointDeVie(),this.sousMarin.getOrientation().toString());
 		}
 		boolean tTouche = estPresent(pos,this.torpilleur.caseOccupeParLeBateau());
 		if(tTouche){
 			this.torpilleur.perdsUnPointDeVie();
-			ObservateurJoueur.touche(pos, Torpilleur.class.getName());
+			ObservateurJoueur.touche(this.torpilleur.getPosition(), "Torpilleur",this.torpilleur.getPointDeVie(),this.torpilleur.getOrientation().toString());
 		}
 		return (pATouche || cTouche || sMTouche || tTouche);
 	}
@@ -118,11 +118,14 @@ public class Joueur  {
 		return estTrouve;
 	}
 	
-	public void placerMine(int pos){
+	public boolean  placerMine(int pos){
 		if(this.getPointDAction() > 0){
 			perdsUnPointDAction();
 			perdsUnPointDAction();
 			this.listeDeMine.add(new Mine(pos));
+			return true;
+		}else{
+			return false;
 		}
 		
 	}
@@ -197,6 +200,22 @@ public class Joueur  {
 	public Croiseur getCroiseur() {
 		return croiseur;
 	}
+	public int getPointVieTorpilleur(){
+		return this.torpilleur.getPointDeVie();
+		
+	}
+	public int getPointViePorteAvion(){
+		return this.porteAvion.getPointDeVie();
+		
+	}
+	public int getPointVieSousMarin(){
+		return this.sousMarin.getPointDeVie();
+		
+	}
+	public int getPointVieCroiseur(){
+		return this.croiseur.getPointDeVie();
+		
+	}
 
 	public void setCroiseur(Croiseur croiseur) {
 		this.croiseur = croiseur;
@@ -250,6 +269,12 @@ public class Joueur  {
 
 	public void setObservateurJoueur(I_ObservateurJoueur observateurJoueur) {
 		ObservateurJoueur = observateurJoueur;
+	}
+
+
+	public boolean plusdevie() {
+		// TODO Auto-generated method stub
+		return ((this.porteAvion.getPointDeVie() == 0) && (this.croiseur.getPointDeVie() == 0) && (this.sousMarin.getPointDeVie()== 0) && (this.torpilleur.getPointDeVie()== 0));
 	}
 	
 }

@@ -18,6 +18,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 	private String nomJoueur;
 	private boolean autoriseJeu = true;
 	private boolean aJouer = false;
+	private boolean posseautorize = true; 
 	private boolean porteAvionPose = false;
 	private boolean sousMarniPose = false;
 	private boolean croiseurPose = false;
@@ -57,6 +58,11 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 			JSONObject etatjson = new JSONObject();
 			etatjson.accumulate("description",etat.getDescription());
 			etatjson.accumulate("id",etat.ordinal());
+			if(etat.ordinal() != 1){
+				posseautorize = false; 
+			}else{
+				posseautorize = true; 
+			}
 			json.accumulate("etat",etatjson);
 			try {
 				this.send(json.toString());
@@ -95,109 +101,124 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 				if(monjeu.adversaire(this) != null){
 					
 					if( message.has("fin") ){
-						if(autoriseJeu && !aJouer && !toutBateauPosse()){
+						if(autoriseJeu && (aJouer==false) || (toutBateauPosse() == false)){
 							monjeu.finDePartie("\n" +this.getNickname() + " n'a pas jouer dans les temps \n"+monjeu.adversaire(this).getNickname() + " gagne !!" );
 						}else{
 							fini = true;
 							monjeu.finDeTour(this);
+							if(((ControleurJoueur) monjeu.adversaire(this)).getJoueur().plusdevie()){
+								monjeu.finDePartie("\n" +this.getNickname() + " a perdu \n"+monjeu.adversaire(this).getNickname() + " GAGNE !!" );
+							}
 							
 						}
 					}
-					aJouer = true;
-					Joueur advaisaire =((ControleurJoueur) monjeu.adversaire(this)).getJoueur();	
-					if( message.has("mine") ){
+					if(autoriseJeu){
 						
-						joueur.placerMine(message.getJSONObject("mine").getInt("pos"));
-						
-						monjeu.actionFaite(message, monjeu.adversaire(this));
-					
-						message.accumulate("plateau", 1);
-						this.send(message.toString());
-						
-					}else{
-						if( message.has("bateauPlacement") ){
-							String bateau =  message.getJSONObject("bateauPlacement").getString("type");
-							int pos = message.getJSONObject("bateauPlacement").getInt("pos");
-							String orientation =  message.getJSONObject("bateauPlacement").getString("orientation");
-							if(bateau.equals("PorteAvion")){
-								ok = joueur.placerPorteAvion(pos, OrientationFactory.create(orientation));
-								porteAvionPose = true;
-							}else if(bateau.equals("Croiseur")){
-								ok = joueur.placerCroiseur(pos, OrientationFactory.create(orientation));
-								croiseurPose = true;
-							}else if(bateau.equals("SousMarin")){
-								ok = joueur.placerSousMarin(pos, OrientationFactory.create(orientation));
-								 sousMarniPose = true;
-							}else if(bateau.equals("Torpilleur")){
-								ok = joueur.placerTorpilleur(pos, OrientationFactory.create(orientation));
-								torpilleurPose = true;
+						aJouer = true;
+						Joueur advaisaire =((ControleurJoueur) monjeu.adversaire(this)).getJoueur();	
+						if( message.has("mine") ){
+							
+							if(joueur.placerMine(message.getJSONObject("mine").getInt("pos"))){
+								monjeu.actionFaite(message, monjeu.adversaire(this));
+								message.accumulate("plateau", 1);
+								this.send(message.toString());
 							}
 							
+						}else{
+							if( message.has("bateauPlacement") && (posseautorize)){
+								String bateau =  message.getJSONObject("bateauPlacement").getString("type");
+								int pos = message.getJSONObject("bateauPlacement").getInt("pos");
+								String orientation =  message.getJSONObject("bateauPlacement").getString("orientation");
+								int pointDeVie = 0;
+								if(bateau.equals("PorteAvion")){
+									ok = joueur.placerPorteAvion(pos, OrientationFactory.create(orientation));
+									pointDeVie = joueur.getPointViePorteAvion();
+									porteAvionPose = true;
+								}else if(bateau.equals("Croiseur")){
+									ok = joueur.placerCroiseur(pos, OrientationFactory.create(orientation));
+									pointDeVie = joueur.getPointVieCroiseur();
+									croiseurPose = true;
+								}else if(bateau.equals("SousMarin")){
+									ok = joueur.placerSousMarin(pos, OrientationFactory.create(orientation));
+									 sousMarniPose = true;
+									 pointDeVie = joueur.getPointVieSousMarin();
+								}else if(bateau.equals("Torpilleur")){
+									ok = joueur.placerTorpilleur(pos, OrientationFactory.create(orientation));
+									torpilleurPose = true;
+									pointDeVie = joueur.getPointVieTorpilleur();
+								}
+								
+								if(ok){
+									JSONObject json = new JSONObject();
+									json.accumulate("bateau",message.getJSONObject("bateauPlacement").accumulate("vie", pointDeVie));
+									monjeu.actionFaite(json,this);
+									json.remove("plateau");
+									json.accumulate("plateau", 1);
+									this.send(json.toString());
+									
+								}else{
+									erreur("placement inposible");
+								}
+								
+								
+							}
+						}
+						
+						if( message.has("bateau") ){
+							
+							
+							String bateau =  message.getJSONObject("bateau").getString("type");
+							int pos = message.getJSONObject("bateau").getInt("pos");
+							String orientation =  message.getJSONObject("bateau").getString("orientation");
+							int pointDeVie = 0;
+							if(bateau.equals("PorteAvion")){
+								ok = joueur.deplacerPorteAvion(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+								pointDeVie = joueur.getPointViePorteAvion();
+							}else if(bateau.equals("Croiseur")){
+								ok = joueur.deplacerCroiseur(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+								pointDeVie = joueur.getPointVieCroiseur();
+							}else if(bateau.equals("SousMarin")){
+								ok = joueur.deplacerSousMarin(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+								pointDeVie = joueur.getPointVieSousMarin();
+							}else if(bateau.equals("Torpilleur")){
+								ok = joueur.deplacerTorpilleur(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
+								pointDeVie = joueur.getPointVieTorpilleur();
+							}
 							if(ok){
 								JSONObject json = new JSONObject();
-								json.accumulate("bateau",message.getJSONObject("bateauPlacement"));
+								json.accumulate("bateau",message.getJSONObject("bateau").accumulate("vie", pointDeVie));
 								monjeu.actionFaite(json,this);
 								json.remove("plateau");
 								json.accumulate("plateau", 1);
 								this.send(json.toString());
-								
 							}else{
 								erreur("placement inposible");
 							}
+							//this.send(message.toString());
+						}
+						if( message.has("tir") ){
 							
 							
-						}
-					}
-					
-					if( message.has("bateau") ){
-						monjeu.broadcast(message.toString(),false);
-						
-						String bateau =  message.getJSONObject("bateau").getString("type");
-						int pos = message.getJSONObject("bateau").getInt("pos");
-						String orientation =  message.getJSONObject("bateau").getString("orientation");
-						if(bateau.equals("PorteAvion")){
-							ok = joueur.deplacerPorteAvion(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
-						}else if(bateau.equals("Croiseur")){
-							ok = joueur.deplacerCroiseur(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
-						
-						}else if(bateau.equals("SousMarin")){
-							ok = joueur.deplacerSousMarin(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
-						}else if(bateau.equals("Torpilleur")){
-							ok = joueur.deplacerTorpilleur(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
-						}
-						if(ok){
-							JSONObject json = new JSONObject();
-							json.accumulate("bateau",message.getJSONObject("bateau"));
-							json.accumulate("plateau", 1);
+							if(joueur.tireUnMissile(message.getJSONObject("tir").getInt("pos"),advaisaire)){
+								
+								message.getJSONObject("tir").accumulate("resultat", 2);
+							}else{
+								message.getJSONObject("tir").accumulate("resultat", 1);
+							}
+							message.accumulate("plateau", 2);
 							this.send(message.toString());
-							json.remove("plateau");
-							monjeu.actionFaite(json,this);
-						}else{
-				
+							message.remove("plateau");
+							monjeu.actionFaite(message,monjeu.adversaire(this));
+						
+		
 						}
-						this.send(message.toString());
 					}
-					if( message.has("tir") ){
-						
-						
-						if(joueur.tireUnMissile(message.getJSONObject("tir").getInt("pos"),advaisaire)){
-							
-							message.getJSONObject("tir").accumulate("resultat", 2);
-						}else{
-							message.getJSONObject("tir").accumulate("resultat", 1);
-						}
-						message.accumulate("plateau", 2);
-						this.send(message.toString());
-						message.remove("plateau");
-						monjeu.actionFaite(message,monjeu.adversaire(this));
 					
-	
-					}
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				monjeu.broadcast(e.toString(), true);
+				//monjeu.broadcast(e.toString(), true);
 			}
 			monjeu.enVie = true;
 
@@ -261,6 +282,9 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 	public void modifPointAction(int point) {
 		JSONObject json = new JSONObject();
 		json.accumulate("pointAction",point);
+		if(point <= 0){
+			this.setAutorisationJeu(false);
+		}
 		try {
 			this.send(json.toString());
 		} catch (IOException e) {
@@ -268,17 +292,27 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 			e.printStackTrace();
 		}
 		
+		
 	}
 	@Override
-	public void touche(int pos, String Bateau) {
-		JSONObject json = new JSONObject();
-		json.accumulate("touche",pos);
+	public void touche(int pos, String Bateau, int pointVie,String orientation) {
+		
+		JSONObject jsonBateau = new JSONObject();
+		JSONObject jsonData = new JSONObject();
+		jsonData.accumulate("type",Bateau);
+		jsonData.accumulate("vie",pointVie);
+		jsonData.accumulate("pos", pos);
+		jsonData.accumulate("orientation",orientation);
+		jsonBateau.accumulate("bateau",jsonData);
+		jsonBateau.accumulate("plateau", 1);
 		try {
-			this.send(json.toString());
+			this.send(jsonBateau.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		jsonBateau.remove("plateau");
+		monjeu.actionFaite(jsonBateau,this);
 		
 	}
 	@Override
@@ -296,7 +330,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 
 	@Override
 	public boolean getAutorisationJeu() {
-		// TODO Auto-generated method stub
+		
 		return this.autoriseJeu;
 	}
 
@@ -308,6 +342,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 
 	@Override
 	public void nouveautour() {
+		this.joueur.resetPointsDAction();
 		this.autoriseJeu = true;
 		this.aJouer = false;
 		this.fini = false;
@@ -316,7 +351,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 		try {
 			this.send(json.toString());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}

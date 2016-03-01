@@ -65,5 +65,8 @@ public class OrientationNORTH implements I_Orientation {
 		}
 		return minePresente;
 	}
+	public String toString(){
+		return "N";
+	}
 
 }

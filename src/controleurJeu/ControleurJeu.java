@@ -185,14 +185,16 @@ public class ControleurJeu {
 			if(Joueur1.aFini() && Joueur2.aFini()){
 				this.setEtat(EtatJeu.ENJEU);
 				Joueur1.nouveautour();
+				Joueur2.setAutorisationJeu(false);
 			}
 		}else if(etat == EtatJeu.ENJEU){
 			
 				if(this.Joueur1 == joueur){
 					Joueur2.nouveautour();
-					
+					Joueur1.setAutorisationJeu(false);
 				}else{
 					Joueur1.nouveautour();
+					Joueur2.setAutorisationJeu(false);
 					
 				}
 			
