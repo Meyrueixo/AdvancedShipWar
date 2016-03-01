@@ -15,6 +15,8 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 	public ControleurJeu monjeu;
 	private ClientWebSocket socket;
 	private Joueur joueur;
+	private String nomJoueur;
+	private boolean autoriseJeu = true;
 
 	public ControleurJoueur(ControleurJeu jeu){
 		monjeu = jeu;
@@ -26,6 +28,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 				OrientationNORTH.getInstance(),
 				OrientationNORTH.getInstance(),
 				OrientationNORTH.getInstance());
+		joueur.setObservateurJoueur(this);
 	}
 
 
@@ -37,11 +40,14 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 		monjeu.broadcast(message,true);
 
 	}
-
+	
+	public void setNickname(String nomJoueur) {
+		this.nomJoueur = nomJoueur;
+	}
 	@Override
 	public String getNickname() {
 		// TODO Auto-generated method stub
-		return "Joueur";
+		return this.nomJoueur;
 	}
 
 	@Override
@@ -56,7 +62,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 		
 		
 		if(monjeu != null){
-			boolean ok = true;
+			boolean ok = false;
 			try {	
 				if( message.has("chat") ){
 					traitementChat( message);
@@ -65,37 +71,46 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 					
 					Joueur advaisaire =((ControleurJoueur) monjeu.adversaire(this)).getJoueur();	
 					if( message.has("mine") ){
-						this.send(message.toString());
+						
 						joueur.placerMine(message.getJSONObject("mine").getInt("pos"));
-						monjeu.broadcast(message.toString(),false);
 						
-					}
-					if( message.has("bateauPlacement") ){
-						String bateau =  message.getJSONObject("bateauPlacement").getString("type");
-						int pos = message.getJSONObject("bateauPlacement").getInt("pos");
-						String orientation =  message.getJSONObject("bateauPlacement").getString("orientation");
-						if(bateau.equals("PorteAvion")){
-							ok = joueur.placerPorteAvion(pos, OrientationFactory.create(orientation));
-						}else if(bateau.equals("Croiseur")){
-							ok = joueur.placerCroiseur(pos, OrientationFactory.create(orientation));
+						monjeu.actionFaite(message, monjeu.adversaire(this));
+					
+						message.accumulate("plateau", 1);
+						this.send(message.toString());
 						
-						}else if(bateau.equals("SousMarin")){
-							ok = joueur.placerSousMarin(pos, OrientationFactory.create(orientation));
-						}else if(bateau.equals("Torpilleur")){
-							ok = joueur.placerTorpilleur(pos, OrientationFactory.create(orientation));
+					}else{
+						if( message.has("bateauPlacement") ){
+							String bateau =  message.getJSONObject("bateauPlacement").getString("type");
+							int pos = message.getJSONObject("bateauPlacement").getInt("pos");
+							String orientation =  message.getJSONObject("bateauPlacement").getString("orientation");
+							if(bateau.equals("PorteAvion")){
+								ok = joueur.placerPorteAvion(pos, OrientationFactory.create(orientation));
+							}else if(bateau.equals("Croiseur")){
+								ok = joueur.placerCroiseur(pos, OrientationFactory.create(orientation));
+							
+							}else if(bateau.equals("SousMarin")){
+								ok = joueur.placerSousMarin(pos, OrientationFactory.create(orientation));
+							}else if(bateau.equals("Torpilleur")){
+								ok = joueur.placerTorpilleur(pos, OrientationFactory.create(orientation));
+							}
+							
+							if(ok){
+								JSONObject json = new JSONObject();
+								json.accumulate("bateau",message.getJSONObject("bateauPlacement"));
+								monjeu.actionFaite(json,this);
+								json.remove("plateau");
+								json.accumulate("plateau", 1);
+								this.send(json.toString());
+								
+							}else{
+								erreur("placement inposible");
+							}
+							
+							
 						}
-						
-						if(ok){
-							JSONObject json = new JSONObject();
-							json.accumulate("bateau",message.getJSONObject("bateauPlacement"));
-							this.send(json.toString());
-							monjeu.broadcast(json.toString(),false);
-						}else{
-							erreur("placement inposible");
-						}
-						
-						
 					}
+					
 					if( message.has("bateau") ){
 						monjeu.broadcast(message.toString(),false);
 						
@@ -113,25 +128,38 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 							ok = joueur.deplacerTorpilleur(pos, OrientationFactory.create(orientation),advaisaire.getListeDeMine());
 						}
 						if(ok){
-							/*JSONObject json = new JSONObject();
-							json.accumulate("bateau",message.getJSONObject("bateauPlacement"));*/
+							JSONObject json = new JSONObject();
+							json.accumulate("bateau",message.getJSONObject("bateau"));
+							json.accumulate("plateau", 1);
 							this.send(message.toString());
-							monjeu.broadcast(message.toString(),false);
+							json.remove("plateau");
+							monjeu.actionFaite(json,this);
 						}else{
 				
 						}
 						this.send(message.toString());
 					}
 					if( message.has("tir") ){
-						monjeu.broadcast(message.toString(),false);
-						joueur.tireUnMissile(message.getJSONObject("connect").getInt("pos"),advaisaire);
+						
+						
+						if(joueur.tireUnMissile(message.getJSONObject("tir").getInt("pos"),advaisaire)){
+							
+							message.getJSONObject("tir").accumulate("resultat", 2);
+						}else{
+							message.getJSONObject("tir").accumulate("resultat", 1);
+						}
+						message.accumulate("plateau", 2);
 						this.send(message.toString());
+						message.remove("plateau");
+						monjeu.actionFaite(message,monjeu.adversaire(this));
+					
 	
 					}
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				monjeu.broadcast(e.toString(), true);
 			}
 			monjeu.enVie = true;
 

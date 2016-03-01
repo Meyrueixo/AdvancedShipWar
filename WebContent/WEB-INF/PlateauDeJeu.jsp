@@ -44,12 +44,12 @@
 					</div>
 					<form>
 						<div class="col-md-1">
-							<p><input type="radio" name="typeBateau" id="estPorteAvion" value="Porte-avion">Porte-avion</p>
-	           	 			<p><input type="radio" name="typeBateau" id="estCroiseur" value="croiseur">Croiseur</p>
+							<p><input type="radio" name="typeBateau" id="estPorteAvion" value="PorteAvion">Porte-avion</p>
+	           	 			<p><input type="radio" name="typeBateau" id="estCroiseur" value="Croiseur">Croiseur</p>
 						</div>
 						<div class="col-md-1">
-							<p> <input type="radio" name="typeBateau" id="estSous-marin" value="sous-marin">Sous-marin</p>
-	           	 			<p><input type="radio" name="typeBateau" id="estTorpilleur" value="torpilleur">Torpilleur</p>
+							<p> <input type="radio" name="typeBateau" id="estSous-marin" value="SousMarin">Sous-marin</p>
+	           	 			<p><input type="radio" name="typeBateau" id="estTorpilleur" value="Torpilleur">Torpilleur</p>
 						</div>
 						<div class="col-md-2">
 							<button type="button" class="btn btn-default" aria-label="Left Align" id="direction" >N</button>

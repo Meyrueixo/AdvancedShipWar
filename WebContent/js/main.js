@@ -10,6 +10,7 @@ var boutonTirerMissile = document.getElementById('boutonTirerMissile');
 var boutonDirection = document.getElementById('direction');
 var etatJeu = document.getElementById('etatJeu');
 var boutonPoseBateau = document.getElementById('PoseBateau');
+var poinAction = document.getElementById('poinAction');
 
 //selecteur de bateau
 /*var estPorteAvion = document.getElementById('estPorteAvion');
@@ -41,8 +42,8 @@ var caseTemp =null;
 function preparation(){
 	intervalID = setInterval(Timer,999);
 	var dureeCoup= 120;
-	
-	
+
+
 }
 
 function stopTimer() {
@@ -56,7 +57,7 @@ function Timer()
 	var m=0;
 	var h=0;
 	if(s<0){
-		
+
 		stopTimer();	
 	}
 	else{
@@ -114,6 +115,7 @@ function creationPlateau(idPlateau){
 				left: (Plateau.tailley*j),
 				name : compt,
 				type : 'vide',
+				option :'vide',
 				etat : 'inactif',
 				select : 'non',
 				orientation :'vertical',
@@ -122,7 +124,7 @@ function creationPlateau(idPlateau){
 			compt++;
 		}
 	}// Add element.
-	
+
 	return Plateau 
 }
 
@@ -134,14 +136,14 @@ function changeDirection(){
 	}
 	else if(boutonDirection.textContent == 'E'){
 		boutonDirection.textContent = 'S'	
-		}
+	}
 	else if(boutonDirection.textContent == 'S'){
 		boutonDirection.textContent = 'O'
 	}
 	else if(boutonDirection.textContent =='O'){
 		boutonDirection.textContent = 'N'
 	}
-	
+
 }
 
 function eventSurPlateau(event,Plateau){
@@ -165,12 +167,12 @@ function getBlaze(){
 }
 function selectCase(element){	
 	if (caseTemp !=null){
-			caseTemp.select = 'non';
-			element.select = 'oui';
-			caseTemp = element;
-			render(plateauMaison);
-			render(plateauAdversaire);
-		
+		caseTemp.select = 'non';
+		element.select = 'oui';
+		caseTemp = element;
+		render(plateauMaison);
+		render(plateauAdversaire);
+
 	}
 	else{
 		element.select = 'oui';
@@ -193,14 +195,14 @@ function poserBateau(radio){
 	}else{
 		var type;
 		for (var i=0; i<radio.length;i++) {
-	         if (radio[i].checked) {
-	            type = radio[i].value;
-	         }
-	      }
+			if (radio[i].checked) {
+				type = radio[i].value;
+			}
+		}
 		var bateau = {pos : caseTemp.name,
-					type:type,
-					orientation:boutonDirection.textContent
-					};
+				type:type,
+				orientation:boutonDirection.textContent
+		};
 		caseTemp.select = 'non';
 		sendJson("bateauPlacement",  bateau);
 	}
@@ -211,16 +213,16 @@ function poserMine(event){
 	{
 		alert("Une mine est déjà posée ici");
 	}else{
-		var caseMine = caseTemp.name;
+		var caseMine = {pos: caseTemp.name};
 		caseTemp.select = 'non';
 		sendJson("mine", caseMine);
 	}
-	render(plateauAdversaire);
+	//render(plateauAdversaire);
 }
 
 function tirerMissile(event){
 	if (caseTemp != null){
-		var idCase = caseTemp.name;
+		var idCase = { pos : caseTemp.name};
 		caseTemp.select = 'non';
 		sendJson("tir",idCase);
 	}
@@ -242,126 +244,125 @@ function marquerCase(event){
 		render(plateauMaison);
 	}
 }
-function renduBateau(bateau){
+function renduBateau(bateau,plateau){
 	var taille = 2;
-	if(bateau.type =="Porte-avion"){
+	if(bateau.type =="PorteAvion"){
 		taille = 5;
-	}else if(bateau.type == "croiseur"){
-			taille = 4;
-		}else if(bateau.type =="sous-marin"){
-			taille = 3;
-		}else{}
-	
-	var baseElement = plateauMaison.elements[bateau.pos]
-	
+	}else if(bateau.type == "Croiseur"){
+		taille = 4;
+	}else if(bateau.type =="SousMarin"){
+		taille = 3;
+	}else{}
+
+	var baseElement = plateau.elements[bateau.pos]
+
 	var boxBateau;
 	if(bateau.orientation=='O'){
-		
+
 		boxBateau= {x:(baseElement.left-(baseElement.width*(taille-1))),
 				y:baseElement.top,
 				h:baseElement.height,
 				w:baseElement.width*taille}; 
-		
+
 	}else if(bateau.orientation=='E'){
 		boxBateau= {x:baseElement.left,
 				y:baseElement.top,
 				h:baseElement.height,
 				w:baseElement.width*taille}; 
-		
+
 	}else if(bateau.orientation=='S'){
 		boxBateau= {x:baseElement.left,
 				y:baseElement.top,
 				h:baseElement.height*taille,
 				w:baseElement.width}; 
-		
+
 	}else{
 		boxBateau= {x:baseElement.left,
 				y:(baseElement.top-(baseElement.height*(taille-1))),
 				h:(baseElement.height*taille),
 				w:baseElement.width}; 
 	}
-	
-	
-	plateauMaison.elements.forEach(function(element) {
-	
+
+
+	plateau.elements.forEach(function(element) {
+
 		if((element.left >= boxBateau.x + boxBateau.w)      // trop à droite
 				|| (element.left + element.width <= boxBateau.x) // trop à gauche
 				|| (element.top >= boxBateau.y + boxBateau.h) // trop en bas
 				|| (element.top + element.height <= boxBateau.y)) {// trop en haut
-			
-			
-		
+
+			if(element.option== bateau.type){
+				element.type = 'vide';
+			}
+
 		} else{
 			element.type ='bateau';
-		
+			element.option = bateau.type;
+
 		}
-		
+
 	});
-	
-	
-		          
-	
+	render(plateau);
+
+
+
+}
+function renduMarque(Plateau,element){
+	if (element.etat === 'marque'){
+		Plateau.context.fillStyle = '#FF0000';
+	}else{
+		Plateau.context.fillStyle = '#05EFFF';
+	}
 }
 
 function renderBis(element, Plateau){
-	
+
 	if (element.select == 'oui'){
 		Plateau.context.fillStyle = '#008000';
 		Plateau.context.fillRect(element.left, element.top, element.width, element.height);
 	}
 	else{
 		if(element.type == 'bateau'){
-			
-				Plateau.context.fillStyle = ' #808080';
-				Plateau.context.fillRect(element.left, element.top, element.width-10, element.height);
-				
-			}else{
-				
-				if(element.type == 'mine')
-				{
-					if (element.etat === 'marque'){
-						Plateau.context.fillStyle = '#FF0000';
-					}else{
-						Plateau.context.fillStyle = '#05EFFF';
-					}
-					Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-					Plateau.context.drawImage(mine,element.left, element.top, element.width, element.height);
-				}
-				
-				if (element.type === 'tri'){
-				
-					if (element.etat === 'marque'){
-						Plateau.context.fillStyle = '#FF0000';
-					}else{
-						Plateau.context.fillStyle = '#05EFFF';
-					}
-					Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-					
-					if(touche  == 1){
-						//toucher
-						Plateau.context.fillStyle = '#FF0000';
-					}else if(touche == 2){
-						//rater
-						Plateau.context.fillStyle = '#000000';
-					}
-					Plateau.context.moveTo(element.left, element.top);
-					Plateau.context.lineTo(element.width, element.height);
-					Plateau.context.stroke();
-					
-				
-				
-				}else{
-					if (element.etat === 'marque'){
-						Plateau.context.fillStyle = '#FF0000';
-					}else{
-						Plateau.context.fillStyle = '#05EFFF';
-					}
-					Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-				}
-			}
-		}
+			Plateau.context.fillStyle = ' #008000';
+			Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+			Plateau.context.fillStyle = ' #808080';
+			Plateau.context.fillRect(element.left, element.top, element.width-10, element.height);
 
-	
+		}else{
+			renduMarque(Plateau,element);
+			if(element.type == 'mine')
+			{
+				
+				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+				Plateau.context.drawImage(mine,element.left, element.top, element.width, element.height);
+			}else{
+
+				
+				Plateau.context.fillRect(element.left, element.top, element.width, element.height);
+
+			}
+
+
+		}
+	}
+	if(element.touche  == 1){
+		//rater
+		Plateau.context.beginPath();
+		Plateau.context.strokeStyle  = '#000000';
+		Plateau.context.moveTo(element.left, element.top);
+		Plateau.context.lineTo(element.width+element.left, element.height+element.top);
+		Plateau.context.stroke();
+	}else if(element.touche == 2){
+		//toucher
+		Plateau.context.strokeStyle = '#FF0000';
+		Plateau.context.beginPath();
+		Plateau.context.moveTo(element.left, element.top);
+		Plateau.context.lineTo(element.width+element.left, element.height+element.top);
+		Plateau.context.moveTo(element.width+element.left, element.top);
+		Plateau.context.lineTo(element.left, element.height+element.top);
+		Plateau.context.stroke();
+	}
+
 
 	Plateau.context.strokeStyle = '#000000';
 
@@ -382,7 +383,7 @@ function MessageChat(){
 	var chat = {message: text,destinataire:"tous"};
 	sendJson("chat", chat);
 	textbox.value = "";
- 
+
 }
 /*--------------------web sockect -----------*/
 var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame");
@@ -392,34 +393,45 @@ ws.onopen = function(){
 function connexionPartie(){
 	var connect = {idgame: idJeu,TokenPlayer:idJoueur };
 	sendJson("connect", connect);
-	
+
 }
 /*reception message*/
 ws.onmessage = function(message){
 	try{
 		var objectJson = JSON.parse(message.data);
+		var plateau = plateauAdversaire;
+		if(objectJson.hasOwnProperty("plateau")){
+			if(objectJson.plateau == 1){
+				plateau = plateauMaison;
+			}
+		}
 		if(objectJson.hasOwnProperty("chat")){
 			document.getElementById("chatlog").textContent += objectJson.chat + "\n";
 		}
 		if(objectJson.hasOwnProperty("mine")){
-			plateauAdversaire.elements[objectJson.mine].type = 'mine';
-			render(plateauAdversaire);
+			plateau.elements[objectJson.mine.pos].type = 'mine';
+			render(plateau);
 		}
 		if(objectJson.hasOwnProperty("tir")){
 			document.getElementById("chatlog").textContent += objectJson.tir + "\n"
+			plateau.elements[objectJson.tir.pos].touche = objectJson.tir.resultat;
 		}
 		if(objectJson.hasOwnProperty("bateau")){
-			renduBateau(objectJson.bateau);
+			renduBateau(objectJson.bateau,plateau);
 			document.getElementById("chatlog").textContent += objectJson.bateau.type + "\n"
 		}
 		if(objectJson.hasOwnProperty("erreur")){
-			alert(objectJson.erreur );
+			alert(objectJson.erreur);
 			document.getElementById("chatlog").textContent += objectJson.erreur + "\n"
+		}
+		if(objectJson.hasOwnProperty("pointAction")){
+			poinAction.textContent = "Points d'action : " + objectJson.pointAction;
+		
 		}
 	}catch(exection){
 		document.getElementById("consolLog").textContent += message.data + "\n"+exection;
 	}
-	
+
 };
 /*creation du json*/
 function sendJson(typeObjet, objet){
@@ -440,4 +452,5 @@ function postToServer(){
 }
 function closeConnect(){
 	ws.close();
+	document.getElementById("chatlog").textContent += "Connexion fermé\n"
 }

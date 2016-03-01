@@ -241,5 +241,15 @@ public class Joueur  {
 	public void setListeDeMine(List<Mine> listeDeMine) {
 		this.listeDeMine = listeDeMine;
 	}
+
+
+	public I_ObservateurJoueur getObservateurJoueur() {
+		return ObservateurJoueur;
+	}
+
+
+	public void setObservateurJoueur(I_ObservateurJoueur observateurJoueur) {
+		ObservateurJoueur = observateurJoueur;
+	}
 	
 }

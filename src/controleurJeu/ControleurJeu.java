@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.json.JSONObject;
 
 public class ControleurJeu {
+	
 	public String token;
 	public String nomDeLaPartie;
 	private int nbJoueur;
@@ -20,6 +21,7 @@ public class ControleurJeu {
 	private boolean spectateurAutorise;
     private  AtomicInteger connectionIds = new AtomicInteger(1);
     private  Set<I_ControleurParticipant> connections = new CopyOnWriteArraySet<>();
+    public EtatJeu etat = EtatJeu.ATTENTEJOUEUR;
 	
 	public ControleurJeu() {
 		// TODO Auto-generated constructor stub
@@ -34,6 +36,7 @@ public class ControleurJeu {
 		this.token = token;
 		this.nomDeLaPartie = nomParti;
 		this.idJoueur1 = idJoueur1;
+	
 	}
 	
 	public String getToken(){
@@ -63,9 +66,21 @@ public class ControleurJeu {
 	private void setListeConnections(Set<I_ControleurParticipant> connections) {
 		this.connections = connections;
 	}
+	public void actionFaite(JSONObject json,I_ControleurJoueur joueurOrigine){
+		
+		if(joueurOrigine == Joueur1){
+			json.accumulate("plateau", 1);
+		}else{
+			json.accumulate("plateau", 2);
+		}
+		
+		this.broadcast(json.toString(), false);
+	}
 	
 	public void finDePartie(){
-		broadcast("{\"info\":\"Partie Terminer\"}",true);
+		JSONObject json = new JSONObject();
+		json.accumulate("chat","Partie Terminer");
+		broadcast(json.toString(),true);
 		 for (I_ControleurParticipant client : connections) {
 			 try {
 				client.close();
@@ -106,6 +121,7 @@ public class ControleurJeu {
 	public I_ControleurJoueur getJoueur1() {
 		return Joueur1;
 	}
+	
 	public I_ControleurJoueur adversaire(I_ControleurJoueur joueur){
 		if(Joueur1 != joueur){
 			return Joueur1;
@@ -117,14 +133,22 @@ public class ControleurJeu {
 
 	public void setJoueur1(I_ControleurJoueur joueur1) {
 		Joueur1 = joueur1;
+		this.Joueur1.setNickname("Joueur 1");
 	}
 
 	public I_ControleurJoueur getJoueur2() {
 		return Joueur2;
 	}
+	
+	
 
 	public void setJoueur2(I_ControleurJoueur joueur2) {
 		Joueur2 = joueur2;
+		this.Joueur2.setNickname("Joueur 2");
+		JSONObject json = new JSONObject();
+		json.accumulate("chat","Un adversaire a rejoint la partie.");
+		etat = EtatJeu.PREPARATION;
+		broadcast(json.toString(),true);
 	}
 	
 	public void ajoutParticipant(I_ControleurParticipant part){
