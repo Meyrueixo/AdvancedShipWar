@@ -7,10 +7,11 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+
 import org.json.JSONObject;
 
-@ServerEndpoint(value = "/AdvancedShipWarGame")
-public class ClientWebSocket {
+@ServerEndpoint(value = "/game")
+public class ClientWebSocket  {
 	 //private static final Log log = LogFactory.getLog(ChatAnnotation.class);
 
 	private static final String PLAYER_PREFIX = "Joueur";

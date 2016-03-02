@@ -17,4 +17,6 @@
 		 <servlet-name>index</servlet-name>
 		 <url-pattern>/ListeParties</url-pattern>
 	 </servlet-mapping>
+	
+	
 </web-app>
