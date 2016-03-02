@@ -439,7 +439,8 @@ function MessageChat(){
 
 }
 /*--------------------web sockect -----------*/
-var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/AdvancedShipWarGame");
+// modiffer cette ligne 
+var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/game");
 ws.onopen = function(){
 	connexionPartie();
 };
