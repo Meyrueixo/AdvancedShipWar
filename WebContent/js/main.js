@@ -150,7 +150,8 @@ function creationPlateau(idPlateau){
 				select : 'non',
 				orientation :'vertical',
 				touche : 0,
-				vie : 1
+				vie : 1,
+				premiere : false
 			});
 			compt++;
 		}
@@ -328,6 +329,7 @@ function renduBateau(bateau,plateau){
 				element.vie = 1;
 				element.orientation  = 'vertical';
 				element.option = 'vide';
+				element.premiere =  false;
 			}
 
 		} else{
@@ -337,6 +339,9 @@ function renduBateau(bateau,plateau){
 			element.option = bateau.type;
 			if(bateau.orientation=='E'  || (bateau.orientation=='O')){
 				element.orientation = 'Horizontal';
+			}
+			if(bateau.pos == element.name){
+				element.premiere =  true;
 			}
 			if(conpt < bateau.vie){
 				conpt++;
@@ -373,7 +378,11 @@ function renderBis(element, Plateau){
 				Plateau.context.fillStyle = ' #008000';
 			}
 			Plateau.context.fillRect(element.left, element.top, element.width, element.height);
-			Plateau.context.fillStyle = ' #808080';
+			if(element.premiere == true){
+				Plateau.context.fillStyle = ' #8080FF';
+			}else{
+				Plateau.context.fillStyle = ' #808080';
+			}
 			if(element.orientation == 'Horizontal'){
 				Plateau.context.fillRect(element.left, element.top, element.width, element.height-10);
 			}else{
