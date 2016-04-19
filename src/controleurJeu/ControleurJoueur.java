@@ -66,6 +66,10 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 			json.accumulate("etat",etatjson);
 			try {
 				this.send(json.toString());
+				//actualisation du nom de joueur
+				JSONObject jsonName = new JSONObject();
+				jsonName.accumulate("nickname",this.getNickname());
+				this.send(jsonName.toString());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -212,6 +216,7 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 						
 		
 						}
+						
 					}
 					
 				}

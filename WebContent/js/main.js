@@ -439,13 +439,14 @@ function MessageChat(){
 
 }
 /*--------------------web sockect -----------*/
-// modiffer cette ligne 
+// recuperation de l'url
 
 var CheminComplet = document.location.href;
 var CheminRepertoire  = CheminComplet.substring( CheminComplet.indexOf( "://" )+3 ,CheminComplet.lastIndexOf( "/" ) );
 var nomDomaine = CheminRepertoire.substring(0 ,CheminRepertoire.lastIndexOf( "/" ) );
-R
+
 var ws = new WebSocket("ws://"+nomDomaine+"/AdvancedShipWar/game");
+//connexion
 ws.onopen = function(){
 	connexionPartie();
 };
@@ -505,6 +506,10 @@ ws.onmessage = function(message){
 				document.getElementById("PoseBateau").style = "display:none";
 			}
 		
+		}
+		if(objectJson.hasOwnProperty("nickname")){
+			
+			document.getElementById("msgChat").placeholder = objectJson.nickname;
 		}
 	}catch(exection){
 		document.getElementById("consolLog").textContent += message.data + "\n"+exection;
