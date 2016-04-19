@@ -440,7 +440,12 @@ function MessageChat(){
 }
 /*--------------------web sockect -----------*/
 // modiffer cette ligne 
-var ws = new WebSocket("ws://localhost:8080/AdvancedShipWar/game");
+
+var CheminComplet = document.location.href;
+var CheminRepertoire  = CheminComplet.substring( CheminComplet.indexOf( "://" )+3 ,CheminComplet.lastIndexOf( "/" ) );
+var nomDomaine = CheminRepertoire.substring(0 ,CheminRepertoire.lastIndexOf( "/" ) );
+R
+var ws = new WebSocket("ws://"+nomDomaine+"/AdvancedShipWar/game");
 ws.onopen = function(){
 	connexionPartie();
 };

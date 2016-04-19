@@ -105,11 +105,11 @@ public class ControleurJoueur implements I_ControleurJoueur,I_ObservateurJoueur{
 							monjeu.finDePartie("\n" +this.getNickname() + " n'a pas jouer dans les temps \n"+monjeu.adversaire(this).getNickname() + " gagne !!" );
 						}else{
 							fini = true;
-							monjeu.finDeTour(this);
+							
 							if(((ControleurJoueur) monjeu.adversaire(this)).getJoueur().plusdevie()){
 								monjeu.finDePartie("\n" +this.getNickname() + " a perdu \n"+monjeu.adversaire(this).getNickname() + " GAGNE !!" );
 							}
-							
+							monjeu.finDeTour(this);
 						}
 					}
 					if(autoriseJeu){
